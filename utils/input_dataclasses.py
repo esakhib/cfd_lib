@@ -20,6 +20,7 @@ class InputHeatConductivityData:
     lambda_coef: float | None = None  # thermal conductivity, W / (m * K)
     rho: float | None = None  # density, kg / m^3
 
+    # TODO: add class for boundary and initial conditions
     t_init: float = 100.0  # K
     t_left: float = 100.0  # K
     t_right: float = 300.0  # K
