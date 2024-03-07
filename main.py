@@ -1,7 +1,7 @@
 import logging
 
 from prepare_input_data.get_input_json import prepare_input_json
-from solvers.steady_state_heat_conductivity import SteadyStateHeatConductivity
+from solvers.heat_conduction import SteadyStateHeatConductivity
 from utils.plot_data import plot_results
 
 logging.getLogger().setLevel(logging.INFO)

@@ -4,7 +4,7 @@ import warnings
 
 import numpy as np
 
-from solvers.steady_state_scheme import FiniteVolumeScheme
+from solvers.heat_conduction_discrete_analogue import FiniteVolumeScheme
 from utils.common import timer
 from utils.output_dataclasses import OutputData
 
