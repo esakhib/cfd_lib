@@ -1,5 +1,4 @@
 import numpy as np
-from numba import prange
 
 from utils.tdma import run_tdma
 
@@ -60,27 +59,26 @@ class FiniteVolumeScheme:
         """Initialize discrete analogue by scheme.
         """
 
-        self._b[0] = self._k_w / (self._dx_w / 2.0) * self._left_condition_value
-        self._a_e[0] = self._k_e / self._dx_e
-        self._a_p[0] = self._a_e[0] + self._a_w[0] + self._k_w / (self._dx_w / 2.0)
+        self._b[0] = self._left_condition_value
+        self._a_e[0] = 0.0
+        self._a_w[0] = 0.0
+        self._a_p[0] = 1.0
 
         for i in range(1, self._nx - 1):
             self._a_e[i] = self._k_e / self._dx_e
             self._a_w[i] = self._k_w / self._dx_w
             self._a_p[i] = self._a_w[i] + self._a_e[i]
 
-        self._b[self._nx - 1] = self._k_e / (self._dx_e / 2.0) * self._right_condition_value
-        self._a_w[self._nx - 1] = self._k_w / self._dx_w
-        self._a_p[self._nx - 1] = self._a_e[self._nx - 1] + self._a_w[self._nx - 1] + self._k_e / (self._dx_e / 2.0)
+        self._b[self._nx - 1] = self._right_condition_value
+        self._a_w[self._nx - 1] = 0.0
+        self._a_e[self._nx - 1] = 0.0
+        self._a_p[self._nx - 1] = 1.0
 
     def solve_equation(self):
         """Solve the equation by TDMA algorithm.
         """
 
         run_tdma(self._a_p, self._a_e, self._a_w, self._b, self._result)
-
-        # TODO: something wrong with boundary conditions
-        self._result[0] = self._left_condition_value
 
     @property
     def result(self):
