@@ -4,7 +4,7 @@ import warnings
 
 import numpy as np
 
-from solvers.steady_state_scheme import FiniteVolumeScheme
+from solvers.heat_conduction_discrete_analogue import FiniteVolumeScheme
 from utils.common import timer
 from utils.output_dataclasses import OutputData
 
@@ -46,7 +46,7 @@ class SteadyStateHeatConductivity(FiniteVolumeScheme):
         self._t_right: float = self._input_data['heat_conductivity_data']['t_right']
 
         # calculate parameters
-        dx = self._length / nx
+        dx = self._length / (nx - 1)
         dy = self._height / ny
         self._get_k_coef()
 
@@ -60,6 +60,7 @@ class SteadyStateHeatConductivity(FiniteVolumeScheme):
         self._output_data: OutputData = OutputData()
 
         self._output_data.grid = np.arange(start=0.0, stop=self._length, step=dx)
+
         self._output_data.numerical_solution = self._result
 
         logging.info('End initialization grid and solver data.')

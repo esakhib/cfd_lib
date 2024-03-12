@@ -32,9 +32,6 @@ def prepare_input_json(save_input_data: bool = False, delete_previous_results: b
     # grid data
     nx, ny, x_length, y_height = InputGridData.nx, InputGridData.ny, InputGridData.x_length, InputGridData.y_height
 
-    # tolerance
-    abs_tol, rel_tol = InputSolverData.abs_tol, InputSolverData.rel_tol
-
     # steady-state heat conductivity input data
     sc, sp = InputHeatConductivityData.sc, InputHeatConductivityData.sp
 
@@ -49,8 +46,6 @@ def prepare_input_json(save_input_data: bool = False, delete_previous_results: b
 
     # convert input data to dict
     input_dict = {'grid_data': {'nx': nx, 'ny': ny, 'x_length': x_length, 'y_height': y_height},
-
-                  'solver_data': {'abs_tol': abs_tol, 'rel_tol': rel_tol},
 
                   'heat_conductivity_data': {'sc': sc, 'sp': sp, 'k': k, 'cp': cp, 'lambda_coef': lambda_coef,
                                              'rho': rho, 't_init': t_init, 't_left': t_left, 't_right': t_right}}
