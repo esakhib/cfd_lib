@@ -3,9 +3,9 @@ from dataclasses import dataclass
 
 @dataclass
 class InputGridData:
-    nx: int = 100  # step dx = x_length / nx
+    nx: int = 1000  # step dx = x_length / nx
     ny: int = 1  # step dy = y_height / ny
-    x_length: float = 1000.0  # m
+    x_length: float = 100.0  # m
     y_height: float = 1.0  # m
 
 

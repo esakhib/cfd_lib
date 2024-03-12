@@ -59,6 +59,8 @@ class FiniteVolumeScheme:
         """Initialize discrete analogue by scheme.
         """
 
+        # TODO: add fictive control volume
+
         self._b[0] = self._left_condition_value
         self._a_e[0] = 0.0
         self._a_w[0] = 0.0
@@ -67,6 +69,7 @@ class FiniteVolumeScheme:
         for i in range(1, self._nx - 1):
             self._a_e[i] = self._k_e / self._dx_e
             self._a_w[i] = self._k_w / self._dx_w
+
             self._a_p[i] = self._a_w[i] + self._a_e[i]
 
         self._b[self._nx - 1] = self._right_condition_value
