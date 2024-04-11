@@ -60,6 +60,7 @@ class SteadyStateHeatConductivity(FiniteVolumeScheme):
         self._output_data: OutputData = OutputData()
 
         self._output_data.grid = np.arange(start=0.0, stop=self._length, step=dx)
+        self._output_data.grid = np.append(self._output_data.grid, self._length)
 
         self._output_data.numerical_solution = self._result
 
