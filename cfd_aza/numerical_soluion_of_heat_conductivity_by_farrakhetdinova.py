@@ -11,7 +11,7 @@ dx: float = length/(N-1)   # length of control volume
 delta = 0.1   # extra lenght just for correct programm working
 L = np.arange(start = 0, stop = length + delta, step = dx)  # array with control volumes
 
-k = np.array([8.418 * 10 ** (-5)] * (N + 1), float)  # coefficient of temperature conductivity
+k = np.array([8.418 * 10 ** (-5)] * (N + 1), float)  # coefficient of temperature conductivity (cappa / (Cp * rho))
 T = np.zeros(N)
 a = np.zeros(N)
 b = np.zeros(N)
