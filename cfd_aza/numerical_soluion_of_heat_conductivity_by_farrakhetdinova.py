@@ -11,8 +11,7 @@ dx: float = length/(N-1)   # length of control volume
 delta = 0.1   # extra lenght just for correct programm working
 L = np.arange(start = 0, stop = length + delta, step = dx)  # array with control volumes
 
-k = np.array([203] * (N + 1), float)  # NEED CORRECT VALUE OF TEMPERATURE CONDUCTIVITY COEF,
-#                                       NOT HEAT CONDUCTIVITY!!!
+k = np.array([8.418 * 10 ** (-5)] * (N + 1), float)  # coefficient of temperature conductivity
 T = np.zeros(N)
 a = np.zeros(N)
 b = np.zeros(N)
@@ -23,18 +22,20 @@ Q = np.zeros(N)
 
 # boundary values
 T[0] = 300
+d_o = 300
 a[0], b[0], c[0], d[0] = 1, 0, 0, T[0]
 T[N - 1] = 50
+d_N = 50
 a[N - 1], b[N - 1], c[N - 1], d[N - 1] = 1, 0, 0, T[N - 1]
 
 
-# filling magic arrays
+# filling coefficients of discrete analogue
 for i in range(1, N - 1):  #
     c[i] = k[i - 1] / dx
     b[i] = k[i + 1] / dx
     a[i] = c[i] + b[i]
 
-T = Tf.thomas(a, b, c, d, P, Q, N, T)  # run TDMA (namely magic)
+T = Tf.thomas(a, b, c, d, P, Q, N, T)  # run TDMA
 
 
 # visualising the task of heat conductivity
