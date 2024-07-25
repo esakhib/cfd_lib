@@ -38,8 +38,8 @@ class HeatConductivity(FiniteVolumeScheme):
         self._height = self._grid_time_data.y_height
         nx = self._grid_time_data.nx
         ny = self._grid_time_data.ny
-        nt = self._grid_time_data.nt
-        total_time = self._grid_time_data.total_time
+        # nt = self._grid_time_data.nt
+        # total_time = self._grid_time_data.total_time
 
         # parse initial and boundary conditions
         self._t_init: float = self._equation_input_data.t_init
