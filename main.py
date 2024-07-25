@@ -2,16 +2,18 @@ import logging
 
 import matplotlib.pyplot as plt
 
-from prepare_input_data.get_input_json import prepare_input_json
-from solvers.heat_conduction import SteadyStateHeatConductivity
+from utils.equation_type import get_input_data_by_equation, EquationTypeEnum
 
 logging.getLogger().setLevel(logging.INFO)
 
-# parse input data
-input_json = prepare_input_json(save_input_data=False, delete_previous_results=True)
+# set equation type
+equation_type = EquationTypeEnum.HEAT_CONDUCTIVITY
+
+# gat data for solving equation
+input_data = get_input_data_by_equation(equation_type=equation_type)
 
 # initialize the equation
-equation = SteadyStateHeatConductivity(input_json=input_json)
+equation = input_data.equation_solver(input_data=input_data)
 
 # solve analytical
 equation.solve_analytical()
