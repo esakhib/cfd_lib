@@ -26,7 +26,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         logging.info('Start initialization grid and solver data...')
 
-        # read and parse input/otuput data
+        # read and parse input/output data
         self._input_data = input_data
         self._grid_time_data = self._input_data.grid_time_data
         self._equation_input_data = self._input_data.equation_input_data
@@ -40,8 +40,6 @@ class DiffsuionConvection(FiniteVolumeScheme):
         nt = self._grid_time_data.nt
         total_time = self._grid_time_data.total_time
 
-        self._d = self._equation_input_data.d
-
         # parse initial and boundary conditions
         self._c_init: float = self._equation_input_data.c_init
         self._c_left: float = self._equation_input_data.c_left
@@ -54,16 +52,24 @@ class DiffsuionConvection(FiniteVolumeScheme):
         # calculate parameters
         dx = self._length / (nx - 1)
         dy = 1.0
+        dt = total_time / (nt - 1)
+
+        # TODO: 2D grid
         # dy = self._height / (ny - 1)
-        dt = total_time / nt
+
+        self._d = self._equation_input_data.d
+        self._u_sed = self._calc_u_sed(c=self._c_init)
 
         # initialize scheme class
         super().__init__(
             nx=nx,
             ny=ny,
+            nt=nt,
             dx=dx,
             dy=dy,
+            dt=dt,
             d=self._d,
+            u_sed=self._u_sed,
             c_initial_time_value=self._c_init,
             c_left_condition_value=self._c_left,
             c_right_condition_value=self._c_right,
@@ -79,7 +85,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         logging.info('End initialization grid and solver data.')
 
-    def _calc_u_sed(self, C) -> float:
+    def _calc_u_sed(self, c) -> float:
         """Calculate U_sed by C value.
 
         Returns
@@ -95,9 +101,9 @@ class DiffsuionConvection(FiniteVolumeScheme):
         rho1 = self._equation_input_data.rho1
         rho2 = self._equation_input_data.rho2
         mu2 = self._equation_input_data.mu2
-        f_C = self._equation_input_data.f_C
+        f_c = self._equation_input_data.f_c
 
-        return const * r0 ** 2.0 * g * (rho1 - rho2) * f_C(C) / mu2
+        return const * r0 ** 2.0 * g * (rho1 - rho2) * f_c(c) / mu2
 
     @timer
     def solve_numerical(self):

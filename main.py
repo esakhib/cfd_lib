@@ -7,7 +7,7 @@ from utils.equation_type import get_input_data_by_equation, EquationTypeEnum
 logging.getLogger().setLevel(logging.INFO)
 
 # set equation type
-equation_type = EquationTypeEnum.HEAT_CONDUCTIVITY
+equation_type = EquationTypeEnum.DIFFUSION_CONVECTION
 
 # gat data for solving equation
 input_data = get_input_data_by_equation(equation_type=equation_type)

@@ -4,8 +4,8 @@ from typing import Callable
 from scipy.constants import g
 
 
-def f_C(C: float) -> float:
-    return (1.0 - C) ** 4.7
+def f_c(c: float) -> float:
+    return (1.0 - c) ** 4.7
 
 
 @dataclass
@@ -27,7 +27,7 @@ class InputData:
     # Used
     const_u_sed = 0.2  # 2 / 9
     g: float = g  # physical constant
-    f_C: Callable = f_C  # approximation function
+    f_c: Callable = f_c  # approximation function
     r0: float = 0.0001  # m
     rho1: float = 1000.0  # kg / m^3
     rho2: float = 900.0  # kg / m^3
