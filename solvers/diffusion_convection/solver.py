@@ -112,7 +112,11 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         logging.info('Start numerical solution...')
 
-        self.initialize_discrete_analogue()
+        c_old_time_step = np.full_like(self._result.shape, self._c_init)
+        c_new_time_step = np.full_like(self._result.shape, self._c_init)
+
+        for i in np.arange(0, )
+            self.initialize_discrete_analogue()
 
         self.solve_equation()
 
