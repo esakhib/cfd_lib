@@ -10,12 +10,12 @@ def f_c(c: float) -> float:
 
 @dataclass
 class GridTimeData:
-    nx: int = 1000  # step dx = x_length / nx
+    nx: int = 10  # step dx = x_length / nx
     ny: int = 1  # step dy = y_height / ny
     x_length: float = 100.0  # m
     y_height: float = 1.0  # m
-    nt: int = 1000
-    total_time = 100.0
+    nt: int = 10
+    total_time = 100
 
 
 @dataclass
@@ -42,7 +42,3 @@ class InputData:
     c_init: float = 0.5  #
     c_left: float = 0.1  #
     c_right: float = 0.9  #
-
-    u_init: float = 1.0  #
-    u_left: float = 100.0  #
-    u_right: float = 300.0  #

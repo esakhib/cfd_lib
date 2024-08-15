@@ -116,14 +116,13 @@ class DiffsuionConvection(FiniteVolumeScheme):
         c_old_time_step[0, 0] = self._c_left
         c_old_time_step[-1, -1] = self._c_right
 
-        # list of solutions by each time iteration
-        solutions = []
-
         # start time
         current_time = 0.0
 
         # loop through time layers
         while current_time <= self._total_time:
+            logging.info(f'Solving for time = {current_time}')
+
             # discrete analogue
             self.initialize_discrete_analogue(old_time_solution=c_old_time_step)
 

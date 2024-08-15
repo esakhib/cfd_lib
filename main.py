@@ -30,8 +30,8 @@ plt.grid(True)
 plt.title('Распределение температуры в зависимости от длины', size=20)
 plt.plot(equation.output_data.grid, equation.output_data.numerical_solution.reshape(-1), '.k', markersize=15,
          label='Численное решение')
-plt.plot(equation.output_data.grid, equation.output_data.analytical_solution, '.r', markersize=10,
-         label='Аналитическое решение')
+# plt.plot(equation.output_data.grid, equation.output_data.analytical_solution, '.r', markersize=10,
+#          label='Аналитическое решение')
 plt.xlabel('Длина, м', fontsize=20)
 plt.ylabel('Температура, К', fontsize=20)
 plt.legend(loc='best', prop={'size': 20})
