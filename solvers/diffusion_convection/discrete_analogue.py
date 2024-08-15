@@ -15,10 +15,7 @@ class FiniteVolumeScheme:
                  u_sed: float,
                  c_left_condition_value: float,
                  c_right_condition_value: float,
-                 c_initial_time_value: float,
-                 u_left_condition_value: float,
-                 u_right_condition_value: float,
-                 u_initial_time_value: float):
+                 c_initial_time_value: float):
         """Finite volume method scheme by describing discrete analogue of the equation.
 
         Parameters
@@ -45,12 +42,6 @@ class FiniteVolumeScheme:
             Right boundary condition value for concentration.
         c_initial_time_value: float
             Initial condition value for concentration.
-        u_left_condition_value: float
-            Left boundary condition value for X velocity.
-        u_right_condition_value: float
-            Right boundary condition value for X velocity.
-        u_initial_time_value: float
-            Initial condition value for X velocity.
 
         """
 
@@ -81,10 +72,6 @@ class FiniteVolumeScheme:
         self._c_right_condition_value = c_right_condition_value
         self._c_initial_time_value = c_initial_time_value
 
-        self._u_left_condition_value = u_left_condition_value
-        self._u_right_condition_value = u_right_condition_value
-        self._u_initial_time_value = u_initial_time_value
-
         self._a_p: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._a_e: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._a_w: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
@@ -94,27 +81,32 @@ class FiniteVolumeScheme:
 
         self._result = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
 
-    def initialize_discrete_analogue(self):
+    def initialize_discrete_analogue(self, old_time_solution: np.ndarray):
         """Initialize discrete analogue by scheme.
         """
 
-        self._b[0] = self._c_left_condition_value * (2.0 * self._d_w / self._dx_w + self._u_sed_w) + ...  # (a_p*C_p)^t
+        # left boundary
+        self._b[0] = self._c_left_condition_value * (2.0 * self._d_w / self._dx_w + self._u_sed_w) + old_time_solution[0]
         self._a_e[0] = self._d_e / self._dx_e + max(-self._u_sed_e, 0.0)
         self._a_w[0] = 0.0
         self._a_p[0] = (self._a_e[0] + self._a_w[0] +
                         (self._u_sed_e - self._u_sed_w) +
                         self._dx / self._dt + 2.0 * self._d_w / self._dx_w + self._u_sed_w)
 
+        # center
         for i in range(1, self._nx - 1):
             self._a_e[i] = self._d_e / self._dx_e + max(-self._u_sed_e, 0.0)
             self._a_w[i] = self._d_w / self._dx_w + max(self._u_sed_w, 0.0)
+
             self._a_p[i] = (self._dx / self._dt +
                             self._d_e / self._dx_e +
                             self._d_w / self._dx_w +
                             (self._u_sed_e - self._u_sed_w))
-            self._b[i] = ...  # (a_p*C_p)^t
 
-        self._b[self._nx - 1] = self._c_right_condition_value * (2.0 * self._d_e / self._dx_e) + ...  # (a_p*C_p)^t
+            self._b[i] = old_time_solution[i]
+
+        # right boundary
+        self._b[self._nx - 1] = self._c_right_condition_value * (2.0 * self._d_e / self._dx_e) + old_time_solution[self._nx - 1]
         self._a_w[self._nx - 1] = self._d_w / self._dx_w + max(self._u_sed_w, 0.0)
         self._a_e[self._nx - 1] = 0.0
         self._a_p[self._nx - 1] = ((self._a_e[self._nx - 1] + self._a_w[self._nx - 1] +
@@ -129,4 +121,8 @@ class FiniteVolumeScheme:
 
     @property
     def result(self):
+        return self._result
+
+    @property
+    def result_total(self):
         return self._result

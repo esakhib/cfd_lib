@@ -38,21 +38,20 @@ class DiffsuionConvection(FiniteVolumeScheme):
         nx = self._grid_time_data.nx
         ny = self._grid_time_data.ny
         nt = self._grid_time_data.nt
-        total_time = self._grid_time_data.total_time
+        self._total_time = self._grid_time_data.total_time
 
         # parse initial and boundary conditions
         self._c_init: float = self._equation_input_data.c_init
         self._c_left: float = self._equation_input_data.c_left
         self._c_right: float = self._equation_input_data.c_right
 
-        self._u_init: float = self._equation_input_data.u_init
-        self._u_left: float = self._equation_input_data.u_left
-        self._u_right: float = self._equation_input_data.u_right
+        # list of solutions by each time iteration
+        self._solutions: list = []
 
         # calculate parameters
         dx = self._length / (nx - 1)
         dy = 1.0
-        dt = total_time / (nt - 1)
+        self._dt = self._total_time / (nt - 1)
 
         # TODO: 2D grid
         # dy = self._height / (ny - 1)
@@ -67,21 +66,19 @@ class DiffsuionConvection(FiniteVolumeScheme):
             nt=nt,
             dx=dx,
             dy=dy,
-            dt=dt,
+            dt=self._dt,
             d=self._d,
             u_sed=self._u_sed,
             c_initial_time_value=self._c_init,
             c_left_condition_value=self._c_left,
-            c_right_condition_value=self._c_right,
-            u_initial_time_value=self._u_init,
-            u_left_condition_value=self._u_left,
-            u_right_condition_value=self._u_right
+            c_right_condition_value=self._c_right
         )
 
         self._equation_output_data.grid = np.arange(start=0.0, stop=self._length, step=dx)
         self._equation_output_data.grid = np.append(self._equation_output_data.grid, self._length)
 
         self._equation_output_data.numerical_solution = self._result
+        self._equation_output_data.total_solutions = self._solutions
 
         logging.info('End initialization grid and solver data.')
 
@@ -112,13 +109,35 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         logging.info('Start numerical solution...')
 
-        c_old_time_step = np.full_like(self._result.shape, self._c_init)
-        c_new_time_step = np.full_like(self._result.shape, self._c_init)
+        # set initial condition
+        c_old_time_step = np.full_like(self._result, self._c_init)
 
-        for i in np.arange(0, )
-            self.initialize_discrete_analogue()
+        # set boundary condition
+        c_old_time_step[0, 0] = self._c_left
+        c_old_time_step[-1, -1] = self._c_right
 
-        self.solve_equation()
+        # list of solutions by each time iteration
+        solutions = []
+
+        # start time
+        current_time = 0.0
+
+        # loop through time layers
+        while current_time <= self._total_time:
+            # discrete analogue
+            self.initialize_discrete_analogue(old_time_solution=c_old_time_step)
+
+            # solve numerical using discrete scheme
+            self.solve_equation()
+
+            # next time step
+            current_time += self._dt
+
+            # update time solution
+            c_old_time_step = self._result
+
+            # save current time solution
+            self._solutions.append(self._result)
 
         logging.info('End numerical solution.')
 

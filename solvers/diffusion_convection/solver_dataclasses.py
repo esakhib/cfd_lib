@@ -39,9 +39,9 @@ class InputData:
     d: float = 9.46E-19  # m^2 / sec
 
     # TODO: add class for boundary and initial conditions
-    c_init: float = 0.1  #
-    c_left: float = 0.0  #
-    c_right: float = 0.0  #
+    c_init: float = 0.5  #
+    c_left: float = 0.1  #
+    c_right: float = 0.9  #
 
     u_init: float = 1.0  #
     u_left: float = 100.0  #

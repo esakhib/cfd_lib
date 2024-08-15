@@ -114,8 +114,10 @@ class HeatConductivity(FiniteVolumeScheme):
 
         logging.info('Start numerical solution...')
 
+        # discrete analogue
         self.initialize_discrete_analogue()
 
+        # solve numerical using discrete scheme
         self.solve_equation()
 
         logging.info('End numerical solution.')

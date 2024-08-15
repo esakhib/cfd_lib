@@ -16,7 +16,7 @@ input_data = get_input_data_by_equation(equation_type=equation_type)
 equation = input_data.equation_solver(input_data=input_data)
 
 # solve analytical
-equation.solve_analytical()
+# equation.solve_analytical()
 
 # solve numerical
 equation.solve_numerical()

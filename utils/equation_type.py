@@ -5,9 +5,9 @@ from typing import Type
 
 import numpy as np
 
+from solvers.diffusion_convection.solver import DiffsuionConvection
 from solvers.diffusion_convection.solver_dataclasses import InputData as InputDataDC, GridTimeData as GridTimeDataDC
 from solvers.heat_conduction.solver import HeatConductivity
-from solvers.diffusion_convection.solver import DiffsuionConvection
 from solvers.heat_conduction.solver_dataclasses import InputData as InputDataHC, GridTimeData as GridTimeDataHC
 
 
@@ -30,6 +30,7 @@ class OutputData:
     grid: np.ndarray = field(default_factory=lambda: np.array([]))  # output domain grid
     numerical_solution: np.ndarray = field(default_factory=lambda: np.array([]))  # output numerical solution
     analytical_solution: np.ndarray | None = field(default_factory=lambda: np.array([]))  # output analytical solution
+    total_solutions: list = field(default_factory=lambda: [])
 
 
 def get_input_data_by_equation(equation_type: EquationTypeEnum) -> EquationData | None:
