@@ -57,7 +57,6 @@ class DiffsuionConvection(FiniteVolumeScheme):
         # dy = self._height / (ny - 1)
 
         self._d = self._equation_input_data.d
-        self._u_sed = self._calc_u_sed(c=self._c_init)
 
         # initialize scheme class
         super().__init__(
@@ -68,7 +67,6 @@ class DiffsuionConvection(FiniteVolumeScheme):
             dy=dy,
             dt=self._dt,
             d=self._d,
-            u_sed=self._u_sed,
             c_initial_time_value=self._c_init,
             c_left_condition_value=self._c_left,
             c_right_condition_value=self._c_right
@@ -77,7 +75,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
         self._equation_output_data.grid = np.arange(start=0.0, stop=self._length, step=dx)
         self._equation_output_data.grid = np.append(self._equation_output_data.grid, self._length)
 
-        self._equation_output_data.numerical_solution = self._result
+        self._equation_output_data.numerical_solution = self._current_solution
         self._equation_output_data.total_solutions = self._solutions
 
         logging.info('End initialization grid and solver data.')
@@ -109,34 +107,40 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         logging.info('Start numerical solution...')
 
-        # set initial condition
-        c_old_time_step = np.full_like(self._result, self._c_init)
+        # задали начальное условие
+        self._old_solution = np.full_like(self._current_solution, self._c_init)
 
-        # set boundary condition
-        c_old_time_step[0, 0] = self._c_left
-        c_old_time_step[-1, -1] = self._c_right
+        # задали граничные условия (константы слева и справа)
+        self._old_solution[0, 0] = self._c_left
+        self._old_solution[-1, -1] = self._c_right
 
-        # start time
+        # начальное время
         current_time = 0.0
 
-        # loop through time layers
+        # цикл через временные слои
         while current_time <= self._total_time:
             logging.info(f'Solving for time = {current_time}')
 
-            # discrete analogue
-            self.initialize_discrete_analogue(old_time_solution=c_old_time_step)
+            # посчитали скорость, используя концентрацию на текущем временном слое
+            u_sed = self._calc_u_sed(self._old_solution)
 
-            # solve numerical using discrete scheme
+            # инициализировали дискретный аналог
+            self.initialize_discrete_analogue(
+                old_time_solution=self._old_solution,
+                u_sed=u_sed
+            )
+
+            # решили методом прогонки для момента времени current_time
             self.solve_equation()
 
-            # next time step
+            # обновили решение на текущем временном слое
+            self._old_solution = self._current_solution
+
+            # переключились на следующий временной слой
             current_time += self._dt
 
-            # update time solution
-            c_old_time_step = self._result
-
-            # save current time solution
-            self._solutions.append(self._result)
+            # сохранили решение для временного слоя current_time в список
+            self._solutions.append(self._current_solution)
 
         logging.info('End numerical solution.')
 

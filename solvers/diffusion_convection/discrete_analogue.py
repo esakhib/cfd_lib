@@ -12,7 +12,6 @@ class FiniteVolumeScheme:
                  dy: float,
                  dt: float,
                  d: float,
-                 u_sed: float,
                  c_left_condition_value: float,
                  c_right_condition_value: float,
                  c_initial_time_value: float):
@@ -34,8 +33,6 @@ class FiniteVolumeScheme:
             Step size in time.
         d: float
             Thermal diffusion coefficient.
-        u_sed: float
-            Sedation velocity.
         c_left_condition_value: float
             Left boundary condition value for concentration.
         c_right_condition_value: float
@@ -63,10 +60,10 @@ class FiniteVolumeScheme:
         self._d_s: float = d
         self._d_n: float = d
 
-        self._u_sed_e: float = u_sed
-        self._u_sed_w: float = u_sed
-        self._u_sed_n: float = u_sed
-        self._u_sed_s: float = u_sed
+        self._u_sed_e: float = 0.0
+        self._u_sed_w: float = 0.0
+        self._u_sed_n: float = 0.0
+        self._u_sed_s: float = 0.0
 
         self._c_left_condition_value = c_left_condition_value
         self._c_right_condition_value = c_right_condition_value
@@ -79,11 +76,18 @@ class FiniteVolumeScheme:
         self._a_s: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._b: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
 
-        self._result = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+        self._current_solution = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+        self._old_solution = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
 
-    def initialize_discrete_analogue(self, old_time_solution: np.ndarray):
+    def initialize_discrete_analogue(self, old_time_solution: np.ndarray, u_sed: float):
         """Initialize discrete analogue by scheme.
         """
+
+        # update velocity
+        self._u_sed_e = u_sed
+        self._u_sed_w = u_sed
+        self._u_sed_n = u_sed
+        self._u_sed_s = u_sed
 
         # left boundary
         self._b[0] = self._c_left_condition_value * (2.0 * self._d_w / self._dx_w + self._u_sed_w) + old_time_solution[0]
@@ -117,12 +121,8 @@ class FiniteVolumeScheme:
         """Solve the equation by TDMA algorithm.
         """
 
-        run_tdma(self._a_p, self._a_e, self._a_w, self._b, self._result)
+        run_tdma(self._a_p, self._a_e, self._a_w, self._b, self._current_solution)
 
     @property
-    def result(self):
-        return self._result
-
-    @property
-    def result_total(self):
-        return self._result
+    def current_solution(self):
+        return self._current_solution
