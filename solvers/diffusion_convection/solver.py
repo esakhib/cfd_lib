@@ -46,7 +46,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
         self._c_right: float = self._equation_input_data.c_right
 
         # list of solutions by each time iteration
-        self._solutions: list = []
+        self._solutions: dict = {}
 
         # calculate parameters
         dx = self._length / (nx - 1)
@@ -122,7 +122,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
             logging.info(f'Solving for time = {current_time}')
 
             # посчитали скорость, используя концентрацию на текущем временном слое
-            u_sed = self._calc_u_sed(self._old_solution)
+            u_sed = np.mean(self._calc_u_sed(self._old_solution))
 
             # инициализировали дискретный аналог
             self.initialize_discrete_analogue(
@@ -136,11 +136,11 @@ class DiffsuionConvection(FiniteVolumeScheme):
             # обновили решение на текущем временном слое
             self._old_solution = self._current_solution
 
+            # сохранили решение для временного слоя current_time в список
+            self._solutions[current_time] = self._current_solution
+
             # переключились на следующий временной слой
             current_time += self._dt
-
-            # сохранили решение для временного слоя current_time в список
-            self._solutions.append(self._current_solution)
 
         logging.info('End numerical solution.')
 

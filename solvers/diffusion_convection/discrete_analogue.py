@@ -89,16 +89,7 @@ class FiniteVolumeScheme:
         self._u_sed_n = u_sed
         self._u_sed_s = u_sed
 
-        # left boundary
-        self._b[0] = self._c_left_condition_value * (2.0 * self._d_w / self._dx_w + self._u_sed_w) + old_time_solution[0]
-        self._a_e[0] = self._d_e / self._dx_e + max(-self._u_sed_e, 0.0)
-        self._a_w[0] = 0.0
-        self._a_p[0] = (self._a_e[0] + self._a_w[0] +
-                        (self._u_sed_e - self._u_sed_w) +
-                        self._dx / self._dt + 2.0 * self._d_w / self._dx_w + self._u_sed_w)
-
-        # center
-        for i in range(1, self._nx - 1):
+        for i in range(0, self._nx):
             self._a_e[i] = self._d_e / self._dx_e + max(-self._u_sed_e, 0.0)
             self._a_w[i] = self._d_w / self._dx_w + max(self._u_sed_w, 0.0)
 
@@ -109,13 +100,8 @@ class FiniteVolumeScheme:
 
             self._b[i] = old_time_solution[i]
 
-        # right boundary
-        self._b[self._nx - 1] = self._c_right_condition_value * (2.0 * self._d_e / self._dx_e) + old_time_solution[self._nx - 1]
-        self._a_w[self._nx - 1] = self._d_w / self._dx_w + max(self._u_sed_w, 0.0)
-        self._a_e[self._nx - 1] = 0.0
-        self._a_p[self._nx - 1] = ((self._a_e[self._nx - 1] + self._a_w[self._nx - 1] +
-                                    (self._u_sed_e - self._u_sed_w)) +
-                                   self._dx / self._dt + 2.0 * self._d_e / self._dx_e)
+        self._a_p[0] = (self._a_p[0] + self._a_p[1]) / 2.0
+        self._a_p[-1] = (self._a_p[-1] + self._a_p[-2]) / 2.0
 
     def solve_equation(self):
         """Solve the equation by TDMA algorithm.
