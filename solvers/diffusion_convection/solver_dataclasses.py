@@ -33,12 +33,12 @@ class InputData:
     rho2: float = 900.0  # kg / m^3
     mu2: float = 0.6  # Pa * sec
 
-    rho: float = 1.0  # density, kg / m^3
+    rho: float = 1.0  # fluid density, kg / m^3
     u: float = 1.0  # m / sec (X direction velocity)
     v: float = 0.0  # m / sec (Y direction velocity)
-    d: float = 9.46E-19  # m^2 / sec
+    d: float = 1.  # diffusion coefficient, m^2 / sec
 
     # TODO: add class for boundary and initial conditions
-    c_init: float = 0.0  # initial concentration (t = 0)
-    c_left: float = 0.64  # left boundary concentration (x = 0, t)
-    c_right: float = 0.0  # right boundary concentration (x = L, t)
+    c_init: float = 0.  # initial concentration (t = 0)
+    c_left: float = 2 * 10e-4  # left boundary concentration (x = 0, t)
+    c_right: float = 5 * 10E-4  # right boundary concentration (x = L, t)
