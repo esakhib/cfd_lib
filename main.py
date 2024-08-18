@@ -25,7 +25,7 @@ equation.solve_numerical()
 # _ = plot_results(results=equation.output_data, save_output_fig=True, delete_previous_results=True)
 
 time_keys = list(equation.output_data.total_solutions.keys())
-needed_items = {0: 'k', 2: 'b', 4: 'r', 6: 'y', 8: 'm', len(time_keys) - 1: 'g'}
+needed_items = {0: 'k', 2: 'b', 4: 'r', 6: 'y', 8: 'm'}
 
 # plot results
 fig = plt.figure(figsize=(20, 10), dpi=100)

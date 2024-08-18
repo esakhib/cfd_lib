@@ -80,13 +80,13 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         logging.info('End initialization grid and solver data.')
 
-    def _calc_u_sed(self, c) -> float:
+    def _calc_u_sed(self, c: np.ndarray) -> np.ndarray:
         """Calculate U_sed by C value.
 
         Returns
         ----------
-        C: float
-            Concentration coefficient.
+        c: np.ndarray
+            Concentration coefficients.
 
         """
 
@@ -110,10 +110,6 @@ class DiffsuionConvection(FiniteVolumeScheme):
         # задали начальное условие
         self._old_solution = np.full_like(self._current_solution, self._c_init)
 
-        # задали граничные условия (константы слева и справа)
-        self._old_solution[0, 0] = self._c_left
-        self._old_solution[-1, -1] = self._c_right
-
         # начальное время
         current_time = 0.0
 
@@ -121,22 +117,26 @@ class DiffsuionConvection(FiniteVolumeScheme):
         while current_time <= self._total_time:
             logging.info(f'Solving for time = {current_time}')
 
-            # посчитали скорость, используя концентрацию на текущем временном слое
-            u_sed = np.mean(self._calc_u_sed(self._old_solution))
+            # задаем ГУ слева и справа
+            self._old_solution[0, 0] = self._c_left
+            self._old_solution[-1, -1] = self._c_right
 
-            # инициализировали дискретный аналог
+            # посчитаем скорость, используя концентрацию на текущем временном слое
+            u_sed = self._calc_u_sed(self._old_solution)
+            self.update_u_sed(u_sed)
+
+            # инициализиурем дискретный аналог, используя решение на текущем временном слое
             self.initialize_discrete_analogue(
-                old_time_solution=self._old_solution,
-                u_sed=u_sed
+                old_time_solution=self._old_solution
             )
 
-            # решили методом прогонки для момента времени current_time
+            # получаем решение на следующем временном слое
             self.solve_equation()
 
-            # обновили решение на текущем временном слое
+            # обновляем решение на текущем временном слое
             self._old_solution = self._current_solution
 
-            # сохранили решение для временного слоя current_time в список
+            # сохраняем решение для временного слоя current_time в словарь
             self._solutions[current_time] = self._current_solution
 
             # переключились на следующий временной слой

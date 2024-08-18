@@ -60,11 +60,6 @@ class FiniteVolumeScheme:
         self._d_s: float = d
         self._d_n: float = d
 
-        self._u_sed_e: float = 0.0
-        self._u_sed_w: float = 0.0
-        self._u_sed_n: float = 0.0
-        self._u_sed_s: float = 0.0
-
         self._c_left_condition_value = c_left_condition_value
         self._c_right_condition_value = c_right_condition_value
         self._c_initial_time_value = c_initial_time_value
@@ -76,32 +71,61 @@ class FiniteVolumeScheme:
         self._a_s: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._b: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
 
+        self._u_sed_e: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+        self._u_sed_w: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+        self._u_sed_n: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+        self._u_sed_s: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+
         self._current_solution = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._old_solution = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
 
-    def initialize_discrete_analogue(self, old_time_solution: np.ndarray, u_sed: float):
+    def initialize_discrete_analogue(self, old_time_solution: np.ndarray):
         """Initialize discrete analogue by scheme.
+
+        Parameters
+        ----------
+        old_time_solution : np.ndarray
+            Solution on current_time.
+
         """
 
-        # update velocity
-        self._u_sed_e = u_sed
-        self._u_sed_w = u_sed
-        self._u_sed_n = u_sed
-        self._u_sed_s = u_sed
+        self._a_e[0] = self._d_e / self._dx_e + max(-self._u_sed_e[0], 0.0)
+        self._a_w[0] = self._d_w / self._dx_w + self._u_sed_w[0]
+        self._a_p[0] = (self._dx / self._dt + self._d_e / self._dx_e + self._d_w / self._dx_w +
+                        max(self._u_sed_e[0], 0.0))
 
-        for i in range(0, self._nx):
-            self._a_e[i] = self._d_e / self._dx_e + max(-self._u_sed_e, 0.0)
-            self._a_w[i] = self._d_w / self._dx_w + max(self._u_sed_w, 0.0)
+        self._b[0] = self._dx / self._dt * old_time_solution[0]
 
-            self._a_p[i] = (self._dx / self._dt +
-                            self._d_e / self._dx_e +
-                            self._d_w / self._dx_w +
-                            (self._u_sed_e - self._u_sed_w))
+        for i in range(1, self._nx - 1):
+            self._a_e[i] = self._d_e / self._dx_e + max(-self._u_sed_e[i], 0.0)
+            self._a_w[i] = self._d_w / self._dx_w + max(self._u_sed_w[i], 0.0)
+            self._a_p[i] = (self._dx / self._dt + self._d_e / self._dx_e + self._d_w / self._dx_w +
+                            (self._u_sed_e[i] - self._u_sed_w[i]))
 
-            self._b[i] = old_time_solution[i]
+            self._b[i] = self._dx / self._dt * old_time_solution[i]
 
-        self._a_p[0] = (self._a_p[0] + self._a_p[1]) / 2.0
-        self._a_p[-1] = (self._a_p[-1] + self._a_p[-2]) / 2.0
+        self._a_e[self._nx - 1] = self._d_e / self._dx_e - self._u_sed_e[self._nx - 1]
+        self._a_w[self._nx - 1] = self._d_w / self._dx_w + max(self._u_sed_w[i], 0.0)
+        self._a_p[self._nx - 1] = (self._dx / self._dt + self._d_e / self._dx_e + self._d_w / self._dx_w +
+                                   max(-self._u_sed_w[self._nx - 1], 0.0))
+
+        self._b[self._nx - 1] = self._dx / self._dt * old_time_solution[self._nx - 1]
+
+    def update_u_sed(self, new_u_sed: np.ndarray):
+        """Update velocity by concentration.
+
+        Parameters
+        ----------
+        new_u_sed : np.ndarray
+            Recalculated velocity by new old_time_solution.
+
+
+        """
+
+        self._u_sed_w = new_u_sed
+        self._u_sed_e = new_u_sed
+        self._u_sed_n = new_u_sed
+        self._u_sed_s = new_u_sed
 
     def solve_equation(self):
         """Solve the equation by TDMA algorithm.
