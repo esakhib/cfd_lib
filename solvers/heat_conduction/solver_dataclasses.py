@@ -2,15 +2,17 @@ from dataclasses import dataclass
 
 
 @dataclass
-class InputGridData:
+class GridTimeData:
     nx: int = 1000  # step dx = x_length / nx
     ny: int = 1  # step dy = y_height / ny
     x_length: float = 100.0  # m
     y_height: float = 1.0  # m
+    nt: int = 1000
+    total_time = 100.0
 
 
 @dataclass
-class InputHeatConductivityData:
+class InputData:
     # TODO: add source linearization
     sc: float = 0.0  # s = sc + sp * Tp
     sp: float = 0.0  # s = sc + sp * Tp

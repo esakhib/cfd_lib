@@ -6,7 +6,6 @@ import warnings
 from pathlib import Path
 
 from utils.common import timer
-from utils.input_dataclasses import *
 
 
 @timer
@@ -27,28 +26,12 @@ def prepare_input_json(save_input_data: bool = False, delete_previous_results: b
 
     """
 
+    # function prototype for the future
+
     logging.info('Start preparing input data...')
 
-    # grid data
-    nx, ny, x_length, y_height = InputGridData.nx, InputGridData.ny, InputGridData.x_length, InputGridData.y_height
-
-    # steady-state heat conductivity input data
-    sc, sp = InputHeatConductivityData.sc, InputHeatConductivityData.sp
-
-    k, cp, lambda_coef, rho = (InputHeatConductivityData.k,
-                               InputHeatConductivityData.cp,
-                               InputHeatConductivityData.lambda_coef,
-                               InputHeatConductivityData.rho)
-
-    t_init, t_left, t_right = (InputHeatConductivityData.t_init,
-                               InputHeatConductivityData.t_left,
-                               InputHeatConductivityData.t_right)
-
     # convert input data to dict
-    input_dict = {'grid_data': {'nx': nx, 'ny': ny, 'x_length': x_length, 'y_height': y_height},
-
-                  'heat_conductivity_data': {'sc': sc, 'sp': sp, 'k': k, 'cp': cp, 'lambda_coef': lambda_coef,
-                                             'rho': rho, 't_init': t_init, 't_left': t_left, 't_right': t_right}}
+    input_dict = {}
 
     # convert dict to str (json format)
     input_json = json.dumps(input_dict)
