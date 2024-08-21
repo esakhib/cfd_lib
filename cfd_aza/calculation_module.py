@@ -36,4 +36,11 @@ class Equations(MainData):
             self.T_an[i] = self.T_right - (self.T_right - self.T_left) * (self.N - i) / self.N
 
 
+    def result_thomas_solution(self):
+        return self.T_num
+
+    def result_analytical_solution(self):
+        return self.T_an
+
+
 
