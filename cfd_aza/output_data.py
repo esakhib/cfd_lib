@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 import numpy as np
 
-from calculation_module import Equations
-from input_data import ExtraData
 
-
-class OutputData(ExtraData):
-    def
-
+@dataclass
+class OutputData:
+    T_num = np.ndarray
+    T_an = np.ndarray
+    L: float

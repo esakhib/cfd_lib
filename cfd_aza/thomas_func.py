@@ -1,4 +1,8 @@
-def thomas(a, b, c, d, P, Q, N, T):
+import numpy as np
+
+def thomas(a, b, c, d, N, T):
+    P = np.zeros(N)
+    Q = np.zeros(N)
     P[0] = b[0] / a[0]
     Q[0] = d[0] / a[0]
     for i in range(1, N):
@@ -9,4 +13,3 @@ def thomas(a, b, c, d, P, Q, N, T):
     for i in range(N - 1, 0, -1):
         T[i - 1] = P[i - 1] * T[i] + Q[i - 1]
 
-    return T
