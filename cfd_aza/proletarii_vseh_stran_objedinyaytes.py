@@ -14,8 +14,7 @@ output_data.T_num = equation.thomas_solution()
 output_data.T_an = equation.analytical_solution()
 
 plot = Visual(output_data = output_data)
-
-plot.plotting()
+plot.plotting
 
 
 

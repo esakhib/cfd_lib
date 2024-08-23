@@ -1,11 +1,10 @@
 import numpy as np
 
-from input_data import *
 from thomas_func import thomas
 from analytical_func import analytical
 
 
-class Solutions(MainData):
+class Solutions:
     def __init__(self, main_data):
         self.N = main_data.N
         self.length = main_data.length

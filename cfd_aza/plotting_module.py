@@ -7,6 +7,7 @@ class Visual:
         self.T_num = output_data.T_num
         self.T_an = output_data.T_an
         self.L = output_data.L
+
     @property
     def plotting(self):
         mp.plot(self.L, self.T_num, "-*m", label='T_num')
