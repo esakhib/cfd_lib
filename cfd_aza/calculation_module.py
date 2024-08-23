@@ -35,11 +35,13 @@ class Solutions:
             self.b[i] = self.k_arr[i + 1] / self._dx
             self.a[i] = self.c[i] + self.b[i]
 
+    @property
     def thomas_solution(self):
         thomas(self.a, self.b, self.c, self.d, self.N, self.T_num)
 
         return self.T_num
 
+    @property
     def analytical_solution(self):
         analytical(self.T_left, self.T_right, self.N, self.T_an)
 
