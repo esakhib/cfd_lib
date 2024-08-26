@@ -33,7 +33,6 @@ class InputData:
     rho1: float = 1000.0  # kg / m^3
     rho2: float = 900.0  # kg / m^3
     mu2: float = 0.6  # Pa * sec
-
     rho: float = 1.0  # fluid density, kg / m^3
     d: float = 9.46E-19  # diffusion coefficient, m^2 / sec
 

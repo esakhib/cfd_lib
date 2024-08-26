@@ -118,6 +118,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
         while current_time <= self._total_time:
             logging.info(f'Solving for time = {current_time}')
 
+            # граничные условия первого рода будем применять на каждой итерации по временным слоям
             if self._boundary_type == BoundaryType.Dirichlet:
                 self._old_solution[0] = self._c_left_wall
                 self._old_solution[-1] = self._c_right_wall
