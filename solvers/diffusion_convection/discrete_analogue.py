@@ -122,15 +122,15 @@ class FiniteVolumeScheme:
             self._b[self._nx - 1] = self._q_source / self._d_w * self._dx_w
 
         if self._boundary_type == BoundaryType.Robin:
-            self._a_e[0] = 1.0 - self._u_sed_e[0] * self._dx / (2.0 * self._d_e)
+            self._a_e[0] = 1.0 - self._u_sed_e[0] * self._dx_e / (2.0 * self._d_e)
             self._a_w[0] = 0.0
-            self._a_p[0] = 1.0 + self._u_sed_e[0] * self._dx / (2.0 * self._d_e)
+            self._a_p[0] = 1.0 + self._u_sed_e[0] * self._dx_e / (2.0 * self._d_e)
             self._b[0] = 0.0
 
-            self._a_e[0] = 1.0 - self._u_sed_e[0] * self._dx / (2.0 * self._d_e)
-            self._a_w[0] = 0.0
-            self._a_p[0] = 1.0 + self._u_sed_e[0] * self._dx / (2.0 * self._d_e)
-            self._b[0] = 0.0
+            self._a_e[self._nx - 1] = 0.0
+            self._a_w[self._nx - 1] = 1.0 + self._u_sed_w[self._nx - 1] * self._dx_w / (2.0 * self._d_w)
+            self._a_p[self._nx - 1] = 1.0 - self._u_sed_w[self._nx - 1] * self._dx_w / (2.0 * self._d_w)
+            self._b[self._nx - 1] = 0.0
 
         for i in range(1, self._nx - 1):
             self._a_e[i] = self._d_e / self._dx_e + max(-self._u_sed_e[i], 0.0)
