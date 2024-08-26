@@ -80,14 +80,8 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         logging.info('End initialization grid and solver data.')
 
-    def _calc_u_sed(self, c: np.ndarray) -> np.ndarray:
-        """Calculate U_sed by C value.
-
-        Returns
-        ----------
-        c: np.ndarray
-            Concentration coefficients.
-
+    def _calc_u_sed(self, c: np.ndarray):
+        """Calculate U_sed by C values.
         """
 
         const = self._equation_input_data.const_u_sed
@@ -98,7 +92,8 @@ class DiffsuionConvection(FiniteVolumeScheme):
         mu2 = self._equation_input_data.mu2
         f_c = self._equation_input_data.f_c
 
-        return const * r0 ** 2.0 * g * (rho1 - rho2) * f_c(c) / mu2
+        for i in np.arange(1, self._nx - 1):
+            self._u_sed[i] = const * r0 ** 2.0 * g * (rho1 - rho2) * f_c((c[i] + c[i + 1]) / 2.0) / mu2
 
     @timer
     def solve_numerical(self):
@@ -117,13 +112,9 @@ class DiffsuionConvection(FiniteVolumeScheme):
         while current_time <= self._total_time:
             logging.info(f'Solving for time = {current_time}')
 
-            # задаем ГУ слева и справа
-            self._old_solution[0, 0] = self._c_left
-            self._old_solution[-1, -1] = self._c_right
-
             # посчитаем скорость, используя концентрацию на текущем временном слое
-            u_sed = self._calc_u_sed(self._old_solution)
-            self.update_u_sed(u_sed)
+            self._calc_u_sed(self._old_solution)
+            self.update_u_sed()
 
             # инициализиурем дискретный аналог, используя решение на текущем временном слое
             self.initialize_discrete_analogue(

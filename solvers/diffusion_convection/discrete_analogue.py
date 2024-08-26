@@ -71,6 +71,7 @@ class FiniteVolumeScheme:
         self._a_s: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._b: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
 
+        self._u_sed = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._u_sed_e: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._u_sed_w: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._u_sed_n: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
@@ -89,12 +90,10 @@ class FiniteVolumeScheme:
 
         """
 
-        self._a_e[0] = self._d_e / self._dx_e + max(-self._u_sed_e[0], 0.0)
-        self._a_w[0] = self._d_w / self._dx_w + self._u_sed_w[0]
-        self._a_p[0] = (self._dx / self._dt + self._d_e / self._dx_e + self._d_w / self._dx_w +
-                        max(self._u_sed_e[0], 0.0))
-
-        self._b[0] = self._dx / self._dt * old_time_solution[0]
+        self._a_e[0] = 1.0 - self._u_sed_e[0] * self._dx / (2.0 * self._d_e)
+        self._a_w[0] = 0.0
+        self._a_p[0] = 1.0 + self._u_sed_e[0] * self._dx / (2.0 * self._d_e)
+        self._b[0] = 0.0
 
         for i in range(1, self._nx - 1):
             self._a_e[i] = self._d_e / self._dx_e + max(-self._u_sed_e[i], 0.0)
@@ -104,28 +103,19 @@ class FiniteVolumeScheme:
 
             self._b[i] = self._dx / self._dt * old_time_solution[i]
 
-        self._a_e[self._nx - 1] = self._d_e / self._dx_e - self._u_sed_e[self._nx - 1]
-        self._a_w[self._nx - 1] = self._d_w / self._dx_w + max(self._u_sed_w[i], 0.0)
-        self._a_p[self._nx - 1] = (self._dx / self._dt + self._d_e / self._dx_e + self._d_w / self._dx_w +
-                                   max(-self._u_sed_w[self._nx - 1], 0.0))
+        self._a_e[self._nx - 1] = 0.0
+        self._a_w[self._nx - 1] = 1.0 + self._u_sed_w[self._nx - 1] * self._dx / (2.0 * self._d_w)
+        self._a_p[self._nx - 1] = 1.0 - self._u_sed_w[self._nx - 1] * self._dx / (2.0 * self._d_w)
+        self._b[self._nx - 1] = 0.0
 
-        self._b[self._nx - 1] = self._dx / self._dt * old_time_solution[self._nx - 1]
-
-    def update_u_sed(self, new_u_sed: np.ndarray):
+    def update_u_sed(self):
         """Update velocity by concentration.
-
-        Parameters
-        ----------
-        new_u_sed : np.ndarray
-            Recalculated velocity by new old_time_solution.
-
-
         """
 
-        self._u_sed_w = new_u_sed
-        self._u_sed_e = new_u_sed
-        self._u_sed_n = new_u_sed
-        self._u_sed_s = new_u_sed
+        self._u_sed_w = self._u_sed
+        self._u_sed_e = self._u_sed
+        self._u_sed_n = self._u_sed
+        self._u_sed_s = self._u_sed
 
     def solve_equation(self):
         """Solve the equation by TDMA algorithm.
