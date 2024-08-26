@@ -3,6 +3,7 @@ import logging
 import numpy as np
 
 from solvers.diffusion_convection.discrete_analogue import FiniteVolumeScheme
+from solvers.diffusion_convection.solver_dataclasses import BoundaryType
 from utils.common import timer
 
 
@@ -42,11 +43,13 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         # parse initial and boundary conditions
         self._c_init: float = self._equation_input_data.c_init
-        self._c_left: float = self._equation_input_data.c_left
-        self._c_right: float = self._equation_input_data.c_right
+        self._c_wall_left: float = self._equation_input_data.c_wall_left
+        self._c_wall_right: float = self._equation_input_data.c_wall_right
+        self._q_source = self._equation_input_data.q_source
 
         # list of solutions by each time iteration
         self._solutions: dict = {}
+        self._velocity: dict = {}
 
         # calculate parameters
         dx = self._length / (nx - 1)
@@ -67,9 +70,11 @@ class DiffsuionConvection(FiniteVolumeScheme):
             dy=dy,
             dt=self._dt,
             d=self._d,
-            c_initial_time_value=self._c_init,
-            c_left_condition_value=self._c_left,
-            c_right_condition_value=self._c_right
+            c_initial=self._c_init,
+            c_wall_left=self._c_wall_left,
+            c_wall_right=self._c_wall_right,
+            boundary_type=BoundaryType.Neumann,
+            q_source=self._q_source
         )
 
         self._equation_output_data.grid = np.arange(start=0.0, stop=self._length, step=dx)
@@ -77,6 +82,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         self._equation_output_data.numerical_solution = self._current_solution
         self._equation_output_data.total_solutions = self._solutions
+        self._equation_output_data.total_velocity = self._velocity
 
         logging.info('End initialization grid and solver data.')
 
@@ -112,6 +118,10 @@ class DiffsuionConvection(FiniteVolumeScheme):
         while current_time <= self._total_time:
             logging.info(f'Solving for time = {current_time}')
 
+            if self._boundary_type == BoundaryType.Dirichlet:
+                self._old_solution[0] = self._c_left_wall
+                self._old_solution[-1] = self._c_right_wall
+
             # посчитаем скорость, используя концентрацию на текущем временном слое
             self._calc_u_sed(self._old_solution)
             self.update_u_sed()
@@ -129,6 +139,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
             # сохраняем решение для временного слоя current_time в словарь
             self._solutions[current_time] = self._current_solution
+            self._velocity[current_time] = self._u_sed
 
             # переключились на следующий временной слой
             current_time += self._dt

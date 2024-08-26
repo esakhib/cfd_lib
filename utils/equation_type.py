@@ -31,6 +31,7 @@ class OutputData:
     numerical_solution: np.ndarray = field(default_factory=lambda: np.array([]))  # output numerical solution
     analytical_solution: np.ndarray | None = field(default_factory=lambda: np.array([]))  # output analytical solution
     total_solutions: list = field(default_factory=lambda: [])
+    total_velocity: list = field(default_factory=lambda: [])
 
 
 def get_input_data_by_equation(equation_type: EquationTypeEnum) -> EquationData | None:
