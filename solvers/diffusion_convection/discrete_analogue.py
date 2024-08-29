@@ -78,25 +78,19 @@ class FiniteVolumeScheme:
         self._a_s: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._b: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
 
-        self._u_sed = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+        self._u_sed: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._u_sed_e: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._u_sed_w: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._u_sed_n: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._u_sed_s: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
 
-        self._current_solution = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
-        self._old_solution = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
-        self._boundary_type = boundary_type
-        self._q_source = q_source
+        self._current_solution: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+        self._old_solution: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
+        self._boundary_type: BoundaryType = boundary_type
+        self._q_source: float = q_source
 
-    def initialize_discrete_analogue(self, old_time_solution: np.ndarray):
+    def initialize_discrete_analogue(self):
         """Initialize discrete analogue by scheme.
-
-        Parameters
-        ----------
-        old_time_solution : np.ndarray
-            Solution on current_time.
-
         """
 
         if self._boundary_type == BoundaryType.Dirichlet:
@@ -135,10 +129,8 @@ class FiniteVolumeScheme:
         for i in range(1, self._nx - 1):
             self._a_e[i] = self._d_e / self._dx_e + max(-self._u_sed_e[i], 0.0)
             self._a_w[i] = self._d_w / self._dx_w + max(self._u_sed_w[i], 0.0)
-            self._a_p[i] = (self._dx / self._dt + self._d_e / self._dx_e + self._d_w / self._dx_w +
-                            (self._u_sed_e[i] - self._u_sed_w[i]))
-
-            self._b[i] = self._dx / self._dt * old_time_solution[i]
+            self._a_p[i] = self._dx / self._dt + self._d_e / self._dx_e + self._d_w / self._dx_w + (self._u_sed_e[i] - self._u_sed_w[i])
+            self._b[i] = self._dx / self._dt * self._old_solution[i]
 
     def update_u_sed(self):
         """Update velocity by concentration.
@@ -153,7 +145,7 @@ class FiniteVolumeScheme:
         """Solve the equation by TDMA algorithm.
         """
 
-        run_tdma(self._a_p, self._a_e, self._a_w, self._b, self._current_solution)
+        run_tdma(a=self._a_p, b=self._a_e, c=self._a_w, d=self._b, result=self._current_solution)
 
     @property
     def current_solution(self):

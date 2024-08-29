@@ -11,9 +11,9 @@ def f_c(c: float) -> float:
 
 @dataclass
 class GridTimeData:
-    nx: int = 100  # dx = x_length / nx
+    nx: int = 10  # dx = x_length / nx
     ny: int = 1  # dy = y_height / ny
-    x_length: float = 1000.0  # m
+    x_length: float = 0.1  # m
     y_height: float = 1.0  # m
     nt: int = 10  # dt = total_time / nt
     total_time: float = 100.0
@@ -29,11 +29,10 @@ class InputData:
     const_u_sed = 0.2  # 2 / 9
     g: float = g  # physical constant
     f_c: Callable = f_c  # approximation function
-    r0: float = 0.01  # m
+    r0: float = 0.001  # m
     rho1: float = 1000.0  # kg / m^3
     rho2: float = 900.0  # kg / m^3
     mu2: float = 0.6  # Pa * sec
-    rho: float = 1.0  # fluid density, kg / m^3
     d: float = 9.46E-19  # diffusion coefficient, m^2 / sec
 
     c_init: float = 0.01  # initial concentration (t = 0)

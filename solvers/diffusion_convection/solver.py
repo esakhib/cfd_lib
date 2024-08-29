@@ -73,7 +73,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
             c_initial=self._c_init,
             c_wall_left=self._c_wall_left,
             c_wall_right=self._c_wall_right,
-            boundary_type=BoundaryType.Neumann,
+            boundary_type=BoundaryType.Dirichlet,
             q_source=self._q_source
         )
 
@@ -117,20 +117,16 @@ class DiffsuionConvection(FiniteVolumeScheme):
         # цикл через временные слои
         while current_time <= self._total_time:
             logging.info(f'Solving for time = {current_time}')
-
-            # граничные условия первого рода будем применять на каждой итерации по временным слоям
-            if self._boundary_type == BoundaryType.Dirichlet:
-                self._old_solution[0] = self._c_left_wall
-                self._old_solution[-1] = self._c_right_wall
-
-            # посчитаем скорость, используя концентрацию на текущем временном слое
-            self._calc_u_sed(self._old_solution)
-            self.update_u_sed()
+            # # посчитаем скорость, используя концентрацию на текущем временном слое
+            # self._calc_u_sed(self._old_solution)5
+            # self.update_u_sed()
 
             # инициализиурем дискретный аналог, используя решение на текущем временном слое
-            self.initialize_discrete_analogue(
-                old_time_solution=self._old_solution
-            )
+            self.initialize_discrete_analogue()
+            np.savetxt(f'a_p_{current_time}_sec.txt', self._a_p)
+            np.savetxt(f'a_e_{current_time}_sec.txt', self._a_e)
+            np.savetxt(f'a_w_{current_time}_sec.txt', self._a_w)
+            np.savetxt(f'b_{current_time}_sec.txt', self._b)
 
             # получаем решение на следующем временном слое
             self.solve_equation()
