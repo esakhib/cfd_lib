@@ -1,7 +1,7 @@
 import numpy as np
 
-from TDMA_solver import thomas
-from analytical_solver import analytical
+from cfd_aza.heat_conduction.TDMA_solver import thomas
+from cfd_aza.heat_conduction.analytical_solver import analytical
 
 
 class Solutions:
