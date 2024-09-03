@@ -1,6 +1,16 @@
 import numpy as np
 
-def thomas(a, b, c, d, N, T):
+def thomas(a: np.ndarray,
+           b: np.ndarray,
+           c: np.ndarray,
+           d: np.ndarray,
+           N: int,
+           T: np.ndarray):
+    '''
+      Numerical solution for one-dimension stationary heat conductivity
+         with TDMA (Thomas-algorithm)
+    '''
+
     P = np.zeros(N)
     Q = np.zeros(N)
     P[0] = b[0] / a[0]
