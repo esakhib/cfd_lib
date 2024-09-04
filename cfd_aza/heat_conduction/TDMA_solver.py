@@ -1,11 +1,11 @@
 import numpy as np
 
-def thomas(a: np.ndarray,
+def tdma_algorithm(a: np.ndarray,
            b: np.ndarray,
            c: np.ndarray,
            d: np.ndarray,
            N: int,
-           T: np.ndarray):
+           T: np.ndarray) -> None:
     '''
       Numerical solution for one-dimension stationary heat conductivity
          with TDMA (Thomas-algorithm)

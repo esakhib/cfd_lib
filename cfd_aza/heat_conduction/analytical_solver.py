@@ -1,9 +1,9 @@
 import numpy as np
 
-def analytical(T_right: float,
+def analytical_formula(T_right: float,
                T_left: float,
                N: int,
-               T: np.ndarray):
+               T: np.ndarray) -> None:
     '''
       Analytical solution for one-dimension stationary heat conductivity
     '''

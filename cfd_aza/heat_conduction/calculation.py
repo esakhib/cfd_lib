@@ -1,7 +1,7 @@
 import numpy as np
 
-from cfd_aza.heat_conduction.TDMA_solver import thomas
-from cfd_aza.heat_conduction.analytical_solver import analytical
+from cfd_aza.heat_conduction.TDMA_solver import tdma_algorithm
+from cfd_aza.heat_conduction.analytical_solver import analytical_formula
 
 
 class Solutions:
@@ -64,13 +64,13 @@ class Solutions:
 
     def thomas_solution(self):
         ''' Get solution with TDMA '''
-        thomas(self._a, self._b, self._c, self._d, self._N, self._T_numerical)
+        tdma_algorithm(self._a, self._b, self._c, self._d, self._N, self._T_numerical)
         return self._T_numerical
 
 
     def analytical_solution(self):
         ''' Get solution with analytical formula '''
-        analytical(self._T_left, self._T_right, self._N, self._T_analytical)
+        analytical_formula(self._T_left, self._T_right, self._N, self._T_analytical)
         return self._T_analytical
 
 
