@@ -59,7 +59,10 @@ class Solutions:
         for i in range(1, self._N - 1):
             self._c[i] = self._k_arr[i - 1] / self._dx
             self._b[i] = self._k_arr[i + 1] / self._dx
-            self._a[i] = self._c[i] + self._b[i]
+            self._a[i] = self._c[i] + self._b[i]  # a_P = a = b + c + a_Po - (S_p * Dx)
+                                                  # a_Po = rho * c * Dx / Dt
+
+            #self._d[i] = S_c * Dx + a_Po * T_oP  -  необходимо добавить линеаризованный источниковый член, изучить!!!!
 
 
     def thomas_solution(self):
