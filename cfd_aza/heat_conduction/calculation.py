@@ -62,7 +62,7 @@ class Solutions:
             self._a[i] = self._c[i] + self._b[i]  # a_P = a = b + c + a_Po - (S_p * Dx)
                                                   # a_Po = rho * c * Dx / Dt
 
-            #self._d[i] = S_c * Dx + a_Po * T_oP  -  необходимо добавить линеаризованный источниковый член, изучить!!!!
+            #self._d[i] = S_c * Dx + a_Po * T_oP  -  что-то там про линеаризованный источниковый член!!!!
 
 
     def thomas_solution(self):
