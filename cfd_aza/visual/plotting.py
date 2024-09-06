@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as mp
+import matplotlib.animation as animation
 
 
 class Visual:
@@ -21,5 +22,15 @@ class Visual:
         mp.title('Numerical solution of heat conductivity')
         mp.show()
 
+#fig, ax = mp.subplots()
+
+# analytical = ax.scatter(T[0], L[0], c="color", s=3, cmap = "plasma", label='T_analytical')
+#numerical = ax.scatter(T[0], z[0], c="color", s=3, cmap = "plasma", label='T_numerical')
+#ax.set(xlim=[ 'boundary values' ], ylim=[ 'boundary values' ], xlabel='Length, [mm]', ylabel='Temperature, [°C]')
+#ax.legend()
+
+
+#ani = animation.FuncAnimation(fig=fig, func= 'tdma non-stationary' , frames=40, interval=30)
+#mp.show()
 
 
