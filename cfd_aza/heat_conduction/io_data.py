@@ -18,9 +18,9 @@ class InputData:
     rho: float    # density
 
 class OutputData:
-    T_numerical = np.ndarray
-    T_analytical = np.ndarray
-    T_old_solution = np.ndarray
+    T_current_solution_numerical = np.ndarray
+    # T_current_solution_analytical = np.ndarray
+    T_old_solution_numerical = np.ndarray
     L = np.ndarray
 
 

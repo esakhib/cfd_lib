@@ -11,7 +11,7 @@ equation = Solutions(main_data = main_data)
 output_data = OutputData()
 output_data.L = equation._L
 output_data.T_numerical = equation.thomas_solution()
-output_data.T_analytical = equation.analytical_solution()
+#output_data.T_analytical = equation.analytical_solution()
 
 plot = Visual(output_data = output_data)
 plot.plotting()

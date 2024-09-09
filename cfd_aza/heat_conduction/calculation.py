@@ -17,14 +17,15 @@ class Solutions:
                T_left: float  - left boundary condition of temperature
                T_right: float  - right boundary condition of temperature
 
-               T_numerical: np.ndarray  - array with numerical solutions for each control volume
-               T_analytical: np.ndarray  - array with analytical solutions for each control volume
+               T_current_solution_numerical: np.ndarray  - array with numerical solutions for each control volume at This time
+               T_current_solution_analytical: np.ndarray  - array with analytical solutions for each control volume at This time
+               T_old_solution_numerical: np.ndarray  - array with numerical solutions for each control volume at Last time
                a, b, c, d: np.ndarray  - arrays with coefficients of discrete analogue
                                          for each control volume
           --------------------------------------------------------------
           Extra parameters:
                dx: float  - length of control volume
-               dt: float  - time step
+               dt: float  - time step interval
                delta: float  - extra length just for correct program working
                L: np.ndarray  - array with control volumes
           --------------------------------------------------------------
@@ -46,10 +47,10 @@ class Solutions:
         self._dt: float = 0.1
         self._L: np.ndarray = np.arange(start=0, stop=self._length + self._delta, step=self._dx)
 
-        self._T_old_solution: np.ndarray = np.zeros(shape = self._N, dtype = float)
+        self._T_old_solution_numerical: np.ndarray = np.zeros(shape = self._N, dtype = float)
 
-        self._T_numerical: np.ndarray = np.zeros(shape = self._N, dtype = float)
-        self._T_analytical: np.ndarray = np.zeros(shape = self._N, dtype = float)
+        self._T_current_solution_numerical: np.ndarray = np.zeros(shape = self._N, dtype = float)
+        # self._T_current_solution_analytical: np.ndarray = np.zeros(shape = self._N, dtype = float)
 
         # array filled with coefficient of heat conductivity for each control volume
         self._k_arr: np.ndarray = np.array([self._k] * (self._N + 1), float)
@@ -71,19 +72,19 @@ class Solutions:
             self._b[i] = self._k_arr[i - 1] / self._dx
             self._c[i] = self._k_arr[i + 1] / self._dx
             self._a[i] = self._b[i] + self._c[i] + self._A - (self._S_p * self._dx)
-            self._d[i] = self._S_p * self._dx + self._A * self._T_old_solution[i]
+            self._d[i] = self._S_p * self._dx + self._A * self._T_old_solution_numerical[i]
 
 
     def thomas_solution(self):
         ''' Get solution with TDMA '''
-        tdma_algorithm(self._a, self._b, self._c, self._d, self._N, self._T_numerical)
-        return self._T_numerical
+        tdma_algorithm(self._a, self._b, self._c, self._d, self._N, self._T_current_solution_numerical)
+        return self._T_current_solution_numerical
 
 
-    def analytical_solution(self):
-        ''' Get solution with analytical formula '''
-        analytical_formula(self._T_left, self._T_right, self._N, self._T_analytical)
-        return self._T_analytical
+    # def analytical_solution(self):
+    #     ''' Get solution with analytical formula '''
+    #     analytical_formula(self._T_left, self._T_right, self._N, self._T_analytical)
+    #     return self._T_analytical
 
 
 
