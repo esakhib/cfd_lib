@@ -20,6 +20,7 @@ class InputData:
 class OutputData:
     T_numerical = np.ndarray
     T_analytical = np.ndarray
+    T_old_solution = np.ndarray
     L = np.ndarray
 
 
