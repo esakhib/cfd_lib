@@ -42,9 +42,11 @@ class Solutions:
         self._S_p: float = main_data.S_p
         self._S_c: float = main_data.S_c
 
-        self._dx: float = self._length / (self._N - 1)
+        self._time: float = 10
+        self._N_time: int = 5
+        self._dt: float = self._time / (self._N_time - 1)
         self._delta: float = 0.1
-        self._dt: float = 0.1
+        self._dx: float = self._length / (self._N - 1)
         self._L: np.ndarray = np.arange(start=0, stop=self._length + self._delta, step=self._dx)
 
         self._T_old_solution_numerical: np.ndarray = np.zeros(shape = self._N, dtype = float)
@@ -65,7 +67,7 @@ class Solutions:
         self._a[0], self._b[0], self._c[0], self._d[0] = 1, 0, 0, self._T_left
         self._a[self._N - 1], self._b[self._N - 1], self._c[self._N - 1], self._d[self._N - 1] = 1, 0, 0, self._T_right
 
-        self._A = (self._rho * self._c * self._dx) / self._dt
+        self._A = (self._rho * self._c * self._dx) / self._dt  # a_o = (rho * c) / Dt
 
         # filling arrays of coefficients with rule of discrete analogue
         for i in range(1, self._N - 1):
@@ -79,6 +81,18 @@ class Solutions:
         ''' Get solution with TDMA '''
         tdma_algorithm(self._a, self._b, self._c, self._d, self._N, self._T_current_solution_numerical)
         return self._T_current_solution_numerical
+
+
+    @property
+    def N_time(self):
+        return self._N_time
+
+    @property
+    def T_old_solution_numerical(self):
+        return self._T_old_solution_numerical
+    @T_old_solution_numerical.setter
+    def T_old_solution_numerical(self, T_old_solution_numerical):
+        self._T_old_solution_numerical = T_old_solution_numerical
 
 
     # def analytical_solution(self):

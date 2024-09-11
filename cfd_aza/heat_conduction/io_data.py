@@ -20,7 +20,7 @@ class InputData:
 class OutputData:
     T_current_solution_numerical = np.ndarray
     # T_current_solution_analytical = np.ndarray
-    T_old_solution_numerical = np.ndarray
+    # T_old_solution_numerical = np.ndarray
     L = np.ndarray
 
 
