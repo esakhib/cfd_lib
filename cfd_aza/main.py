@@ -12,15 +12,14 @@ output_data = OutputData()
 output_data.L = equation._L
 #output_data.T_analytical = equation.analytical_solution()
 
-plot = Visual(output_data = output_data)
+
 
 for i in range(0, equation.N_time):
+    plot = Visual(output_data = output_data)
     output_data.T_current_solution_numerical = equation.thomas_solution()
     plot.plotting()
     equation.T_old_solution_numerical = output_data.T_current_solution_numerical
 
-
-t=0
 
 
 

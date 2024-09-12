@@ -67,14 +67,14 @@ class Solutions:
         self._a[0], self._b[0], self._c[0], self._d[0] = 1, 0, 0, self._T_left
         self._a[self._N - 1], self._b[self._N - 1], self._c[self._N - 1], self._d[self._N - 1] = 1, 0, 0, self._T_right
 
-        self._A = (self._rho * self._c * self._dx) / self._dt  # a_o = (rho * c) / Dt
+        self._a_o = (self._rho * self._c * self._dx) / self._dt  # a_o = (rho * c) / Dt
 
         # filling arrays of coefficients with rule of discrete analogue
         for i in range(1, self._N - 1):
             self._b[i] = self._k_arr[i - 1] / self._dx
             self._c[i] = self._k_arr[i + 1] / self._dx
-            self._a[i] = self._b[i] + self._c[i] + self._A - (self._S_p * self._dx)
-            self._d[i] = self._S_p * self._dx + self._A * self._T_old_solution_numerical[i]
+            self._a[i] = self._b[i] + self._c[i] + self._a_o - (self._S_p * self._dx)
+            self._d[i] = self._S_c * self._dx + self._a_o * self._T_old_solution_numerical[i]
 
 
     def thomas_solution(self):
