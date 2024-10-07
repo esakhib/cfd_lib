@@ -11,11 +11,11 @@ class InputData:
     T_right: float
 
     # These are for thermal source linearization S = S_c + S_p * T[i]
-    S_p: float
-    S_c: float
+    # S_p: float
+    # S_c: float
 
-    c: float    # specific heat [const]
-    rho: float    # density
+    # c: float    # specific heat [const]
+    # rho: float    # density
 
 class OutputData:
     T_current_solution_numerical = np.ndarray
