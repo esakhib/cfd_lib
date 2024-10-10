@@ -118,7 +118,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
         while current_time <= self._total_time:
             logging.info(f'Solving for time = {current_time}')
             # # посчитаем скорость, используя концентрацию на текущем временном слое
-            # self._calc_u_sed(self._old_solution)5
+            # self._calc_u_sed(self._old_solution)
             # self.update_u_sed()
 
             # инициализиурем дискретный аналог, используя решение на текущем временном слое
