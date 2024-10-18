@@ -7,7 +7,7 @@ import time
 
 
 
-main_data = InputData(N = 50, length = 10, T_right = 100, T_left = 20, k = 5)
+main_data = Dirichlet(N = 5, length = 10, T_right = 100, T_left = 20, k = 5)
 
 equation = Solutions(main_data = main_data, T_old_solution_numerical = main_data.T_left * np.ones(shape = main_data.N, dtype = float))
 

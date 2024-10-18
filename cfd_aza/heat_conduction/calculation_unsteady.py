@@ -1,6 +1,7 @@
 import numpy as np
 
-from cfd_aza.heat_conduction.TDMA_solver import tdma_algorithm
+#from cfd_aza.heat_conduction.TDMA_solver import tdma_algorithm
+from cfd_aza.heat_conduction.TDMA_solver_old import tdma_algorithm
 from cfd_aza.heat_conduction.analytical_solver import analytical_formula
 
 
@@ -40,7 +41,7 @@ class Solutions:
         # self._c: float = main_data.c
         # self._rho: float = main_data.rho
 
-        self._time: float = 20
+        self._time: float = 10
         self._N_time: int = 5
         self._dt: float = self._time / (self._N_time - 1)
         self._delta: float = 0.1
@@ -48,9 +49,6 @@ class Solutions:
         self._L: np.ndarray = np.arange(start=0, stop=self._length + self._delta, step=self._dx)
         self._a_o: float = (self._k * self._dx) / self._dt  # a_o = (rho * c * dx) / Dt
 
-        #linearize temperature S = S_c + S_p * T[i]
-        self._S_c = 0
-        self._S_p = 0
 
         self.T_old_solution_numerical: np.ndarray = T_old_solution_numerical
 
@@ -62,11 +60,17 @@ class Solutions:
         self._c: np.ndarray = np.zeros(shape = self._N, dtype = float)
         self._d: np.ndarray = np.zeros(shape = self._N, dtype = float)
 
+        #linearize temperature source S = S_c + S_p * T[i]
+        self._S_c = 0
+        self._S_p = 0
 
 
         # boundary conditions for coefficients
-        self._a[0], self._b[0], self._c[0], self._d[0] = 1, 0, 0, self._T_left
-        self._a[self._N - 1], self._b[self._N - 1], self._c[self._N - 1], self._d[self._N - 1] = 1, 0, 0, self._T_right
+        self._a[0], self._b[0], self._c[0], self._d[0] = 1, 0, 0, self._T_left #self.T_old_solution_numerical[0]
+        self._a[self._N - 1], self._b[self._N - 1], self._c[self._N - 1], self._d[self._N - 1] = 1, 0, 0, self._T_right #self.T_old_solution_numerical[self._N - 1]
+
+
+
 
         # filling arrays of coefficients with rule of discrete analogue
         for i in range(1, self._N - 1):
