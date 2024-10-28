@@ -9,7 +9,8 @@ import time
 
 main_data = Dirichlet(N = 5, length = 10, T_right = 100, T_left = 20, k = 5)
 
-equation = Solutions(main_data = main_data, T_old_solution_numerical = main_data.T_left * np.ones(shape = main_data.N, dtype = float))
+T_old_solution_numerical = main_data.T_left * np.ones(shape = main_data.N, dtype = float)
+equation = Solutions(main_data = main_data, T_old_solution_numerical = T_old_solution_numerical)
 
 output_data = OutputData()
 output_data.L = equation.L

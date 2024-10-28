@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as mp
 
+import time
 
-def tdma_algorithm(a, b, c, d, N, T) -> None:
+
+def tdma_algorithm(a, b, c, d, N, T):
     '''
       Numerical solution for one-dimension unsteady heat conductivity
          with TDMA (Thomas-algorithm)
@@ -19,6 +21,9 @@ def tdma_algorithm(a, b, c, d, N, T) -> None:
     T[N - 1] = Q[N - 1]
     for i in range(N - 1, 0, -1):
         T[i - 1] = P[i - 1] * T[i] + Q[i - 1]
+
+
+    return T
 
 def discrete_analogue(k_arr, a, b, c, d, dx, S_p, a_o, S_c, T_old_solution_numerical):
     for i in range(1, N - 1):
@@ -37,9 +42,9 @@ T_left: float = 20
 T_right: float = 100
 # c: float = main_data.c
 
-time: float = 10
-N_time: int = 5
-dt: float = time / (N_time - 1)
+time_num: float = 40
+N_time_num: int = 5
+dt: float = time_num / (N_time_num - 1)
 delta: float = 0.1
 dx: float = length / (N - 1)
 L: np.ndarray = np.arange(start=0, stop=length + delta, step=dx)
@@ -55,21 +60,22 @@ T_current_solution_numerical: np.ndarray = np.zeros(shape = N, dtype = float)
 # array filled with coefficient of heat conductivity for each control volume
 k_arr: np.ndarray = np.array([k] * (N + 1), float)
 
-a: np.ndarray = np.zeros(shape = N, dtype = float)
-b: np.ndarray = np.zeros(shape = N, dtype = float)
-c: np.ndarray = np.zeros(shape = N, dtype = float)
-d: np.ndarray = np.zeros(shape = N, dtype = float)
+a_p: np.ndarray = np.zeros(shape = N, dtype = float) # a_p
+a_w: np.ndarray = np.zeros(shape = N, dtype = float) # a_e
+a_e: np.ndarray = np.zeros(shape = N, dtype = float) # a_w
+b: np.ndarray = np.zeros(shape = N, dtype = float) # b
 
 # boundary conditions for coefficients
-a[0], b[0], c[0], d[0] = 1, 0, 0, T_left #self.T_old_solution_numerical[0]
-a[N - 1], b[N - 1], c[N - 1], d[N - 1] = 1, 0, 0, T_right #self.T_old_solution_numerical[N - 1]
+a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 0, T_left
+a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, 0, 0, T_right
 
 # filling arrays of coefficients with rule of discrete analogue
-discrete_analogue(k_arr, a, b, c, d, dx, S_p, a_o, S_c, T_old_solution_numerical)
+discrete_analogue(k_arr, a_p, a_w, a_e, b, dx, S_p, a_o, S_c, T_old_solution_numerical)
 
-for i in range(0, N_time):
+time_num_iter: float = 0
+while (time_num_iter <= time_num):
     fig, ax = mp.subplots()
-    T_current_solution_numerical = tdma_algorithm(a, b, c, d, N, T_old_solution_numerical)
+    T_current_solution_numerical = tdma_algorithm(a_p, a_w, a_e, b, N, T_old_solution_numerical)
     line, = ax.plot(L, T_current_solution_numerical, "-*m", label='[T] numerical')
     mp.legend()
     mp.xlabel('Length, [mm]')
@@ -80,7 +86,8 @@ for i in range(0, N_time):
     time.sleep(0.02)
     mp.show()
     T_old_solution_numerical = T_current_solution_numerical
-
+    discrete_analogue(k_arr, a_p, a_w, a_e, b, dx, S_p, a_o, S_c, T_old_solution_numerical)
+    time_num_iter += dt
 
 
 

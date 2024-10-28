@@ -55,10 +55,10 @@ class Solutions:
         # array filled with coefficient of heat conductivity for each control volume
         self._k_arr: np.ndarray = np.array([self._k] * (self._N + 1), float)
 
-        self._a: np.ndarray = np.zeros(shape = self._N, dtype = float)
+        self._a_p: np.ndarray = np.zeros(shape = self._N, dtype = float)
+        self._a_e: np.ndarray = np.zeros(shape = self._N, dtype = float)
+        self._a_w: np.ndarray = np.zeros(shape = self._N, dtype = float)
         self._b: np.ndarray = np.zeros(shape = self._N, dtype = float)
-        self._c: np.ndarray = np.zeros(shape = self._N, dtype = float)
-        self._d: np.ndarray = np.zeros(shape = self._N, dtype = float)
 
         #linearize temperature source S = S_c + S_p * T[i]
         self._S_c = 0
@@ -66,25 +66,25 @@ class Solutions:
 
 
         # boundary conditions for coefficients
-        self._a[0], self._b[0], self._c[0], self._d[0] = 1, 0, 0, self._T_left #self.T_old_solution_numerical[0]
-        self._a[self._N - 1], self._b[self._N - 1], self._c[self._N - 1], self._d[self._N - 1] = 1, 0, 0, self._T_right #self.T_old_solution_numerical[self._N - 1]
+        self._a_p[0], self._a_e[0], self._a_w[0], self._b[0] = 1, 0, 0, self._T_left #self.T_old_solution_numerical[0]
+        self._a_p[self._N - 1], self._a_e[self._N - 1], self._a_w[self._N - 1], self._b[self._N - 1] = 1, 0, 0, self._T_right #self.T_old_solution_numerical[self._N - 1]
 
 
 
 
         # filling arrays of coefficients with rule of discrete analogue
         for i in range(1, self._N - 1):
-            self._b[i] = self._k_arr[i - 1] / self._dx
-            self._c[i] = self._k_arr[i + 1] / self._dx
-            self._a[i] = self._b[i] + self._c[i] + self._a_o - (self._S_p * self._dx)
-            self._d[i] = self._S_c * self._dx + self._a_o * self.T_old_solution_numerical[i]
+            self._a_e[i] = self._k_arr[i - 1] / self._dx
+            self._a_w[i] = self._k_arr[i + 1] / self._dx
+            self._a_p[i] = self._a_e[i] + self._a_w[i] + self._a_o - (self._S_p * self._dx)
+            self._b[i] = self._S_c * self._dx + self._a_o * self.T_old_solution_numerical[i]
 
 
 
 
     def thomas_solution(self):
         ''' Get solution with TDMA '''
-        tdma_algorithm(self._a, self._b, self._c, self._d, self._N, self.T_old_solution_numerical)
+        tdma_algorithm(self._a_p, self._a_e, self._a_w, self._b, self._N, self.T_old_solution_numerical)
         return self.T_old_solution_numerical
 
 
