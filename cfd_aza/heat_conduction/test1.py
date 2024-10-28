@@ -22,7 +22,8 @@ def tdma_algorithm(a, b, c, d, N, T):
     for i in range(N - 1, 0, -1):
         T[i - 1] = P[i - 1] * T[i] + Q[i - 1]
 
-
+    T[0] = (T[0] + T[1]) / 2
+    T[N-1] = (T[N-1] + T[N-2]) / 2
     return T
 
 def discrete_analogue(k_arr, a, b, c, d, dx, S_p, a_o, S_c, T_old_solution_numerical):
@@ -66,8 +67,8 @@ a_e: np.ndarray = np.zeros(shape = N, dtype = float) # a_w
 b: np.ndarray = np.zeros(shape = N, dtype = float) # b
 
 # boundary conditions for coefficients
-a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 0, T_left
-a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, 0, 0, T_right
+a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, 2 * T_left
+a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, -1, 0, 2 * T_right
 
 # filling arrays of coefficients with rule of discrete analogue
 discrete_analogue(k_arr, a_p, a_w, a_e, b, dx, S_p, a_o, S_c, T_old_solution_numerical)
