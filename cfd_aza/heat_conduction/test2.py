@@ -5,16 +5,15 @@ import time
 
 """ 
 ---------------------
-|     ГУ 1 рода     |
+|     ГУ 2 рода     |
 ---------------------
 """
 
-
 def tdma_algorithm(
-        a_p: np.ndarray, 
-        a_w: np.ndarray, 
-        a_e: np.ndarray, 
-        b: np.ndarray, 
+        a_p: np.ndarray,
+        a_w: np.ndarray,
+        a_e: np.ndarray,
+        b: np.ndarray,
         N: int,
         T: np.ndarray) -> np.ndarray:
     '''
@@ -41,7 +40,7 @@ def tdma_algorithm(
 
 def discrete_analogue(   # это функция для коэф дискр аналога,
                          # она не используется, т.к. раскрыта
-                         # в цикле в теле основной программы 
+                         # в цикле в теле основной программы
         k_arr: np.ndarray,
         a_p: np.ndarray,
         a_w: np.ndarray,
@@ -78,6 +77,8 @@ length: float = 10.0
 k: float = 1000.0
 T_left: float = 100.0
 T_right: float = 500.0
+q_left: float = 1000 # поток слева
+q_right: float = 0 # поток справа
 delta: float = 0.1
 dx: float = length / (N - 1)
 L: np.ndarray = np.arange(start=0, stop=length + delta, step=dx)
@@ -108,13 +109,13 @@ b: np.ndarray = np.zeros(shape = N, dtype = float)
 # цикл с решением уравнений
 time_iter: float = 0.0
 while (time_iter <= all_time):
-    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, 2 * T_left # коэф для фиктивного к.о.
-    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, -1, 0, 2 * T_right # коэф для фиктивного к.о.
+    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, (2 * T_left) # учитываем, что поток и темепратура заданы на фиктивном к.о.
+    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, -1, 0, (2 * T_right) # учитываем, что поток и темепратура заданы на фиктивном к.о.
     for i in range(1, N - 1):
         a_w[i] = k / dx
         a_e[i] = k / dx
         a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx)
-        b[i] = S_c * dx + a_o * T_current_solution_numerical[i]
+        b[i] = S_c * dx + a_o * T_current_solution_numerical[i] + q_left + q_right
     T_current_solution_numerical = tdma_algorithm(a_p, a_w, a_e, b, N, T_current_solution_numerical) # получаем решение на данном временном шаге
     T_old_solution_numerical = np.concatenate((T_old_solution_numerical, T_current_solution_numerical)) # записываем отдельно все эти решения
     print(time_iter, ' sec:  ', T_current_solution_numerical)
