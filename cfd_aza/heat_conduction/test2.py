@@ -122,9 +122,9 @@ def discrete_analogue(
 N: int = 7  # количество к.о.
 length: float = 10.0  # длина всего предмета, m
 k: float = 1000.0  # коэффициент температуровпроводности, m^2 / sec
-T_left: float = 100.0  # температура слева, K
-T_right: float = 500.0  # температура справа, K
-q_left: float = 1000  # поток слева, W / m^2
+T_left: float = 10.0  # температура слева, K
+T_right: float = 50.0  # температура справа, K
+q_left: float = 10000  # поток слева, W / m^2
 q_right: float = 0  # поток справа, W / m^2
 delta: float = 0.1  # m
 dx: float = length / (N - 1)  # m
@@ -132,7 +132,7 @@ L: np.ndarray = np.arange(start=0, stop=length + delta, step=dx)
 # c: float = main_data.c
 
 # данные, касающиеся времени
-all_time: float = 100.0  # все рассматриваемое время, sec
+all_time: float = 10.0  # все рассматриваемое время, sec
 time_steps: int = 5  # количесвто врем промежутков
 dt: float = all_time / (time_steps - 1)  # sec
 a_o: float = (k * dx) / dt  # a_o = (rho * c * dx) / Dt
@@ -166,7 +166,7 @@ while (time_iter <= all_time):
         a_w[i] = k / dx
         a_e[i] = k / dx
         a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx)
-        b[i] = S_c * dx + a_o * T_current_solution_numerical[i] + q_left + q_right
+        b[i] = S_c * dx + a_o * T_current_solution_numerical[i] + ((q_left + q_right) * dx)
     T_current_solution_numerical = tdma_algorithm(a_p, a_w, a_e, b, N,
                                                   T_current_solution_numerical)  # получаем решение на данном временном шаге
     T_old_solution_numerical = np.concatenate(
