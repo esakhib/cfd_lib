@@ -155,9 +155,9 @@ b: np.ndarray = np.zeros(shape=N, dtype=float)
 
 time_iter: float = 0.0  # текущее время
 while (time_iter <= all_time):
-    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, (2 * T_left)  # учитываем, что поток и температура заданы на фиктивном к.о.
+    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, (2 * T_left)  # учитываем фиктивный к.о.
     a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, -1, 0, (
-            2 * T_right)  # учитываем, что поток и температура заданы на фиктивном к.о.
+            2 * T_right)
     for i in range(1, N - 1):
         a_w[i] = k / dx
         a_e[i] = k / dx
