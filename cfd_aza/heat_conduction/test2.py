@@ -121,10 +121,10 @@ def discrete_analogue(
 # данные, касающиеся самого тела
 N: int = 7  # количество к.о.
 length: float = 10.0  # длина всего предмета, m
-k: float = 1000.0  # коэффициент температуровпроводности, m^2 / sec
-T_left: float = 10.0  # температура слева, K
-T_right: float = 50.0  # температура справа, K
-q_left: float = 10000  # поток слева, W / m^2
+k: float = 0.5  # коэффициент температуровпроводности, W / (m * K)
+T_left: float = 100.0  # температура слева, K
+T_right: float = 200.0  # температура справа, K
+q_left: float = 1000  # поток слева, W / m^2
 q_right: float = 0  # поток справа, W / m^2
 delta: float = 0.1  # m
 dx: float = length / (N - 1)  # m

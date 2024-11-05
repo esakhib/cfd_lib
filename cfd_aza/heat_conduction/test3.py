@@ -122,17 +122,17 @@ def discrete_analogue(
 N: int = 7  # количество к.о.
 length: float = 10.0  # длина всего предмета, m
 k: float = 1000.0  # коэффициент температуровпроводности, m^2 / sec
-T_left: float = 10.0  # температура слева, K
-T_right: float = 50.0  # температура справа, K
-T_environment: float = 30  # температура окружающей среды, K
-h: float = 400  # коэффициент теплоотдачи, W / (m^2 * K)
+T_environment: float = 20.0  # температура окружающей среды, K
+T_left: float = 50.0  # температура слева, K
+T_right: float = 10.0  # температура справа, K
+h: float = 250.0  # коэффициент теплоотдачи, W / (m^2 * K)
 delta: float = 0.1  # m
 dx: float = length / (N - 1)  # m
 L: np.ndarray = np.arange(start=0, stop=length + delta, step=dx)
 # c: float = main_data.c
 
 # данные, касающиеся времени
-all_time: float = 100.0  # все рассматриваемое время, sec
+all_time: float = 1000.0  # все рассматриваемое время, sec
 time_steps: int = 5  # количесвто врем промежутков
 dt: float = all_time / (time_steps - 1)  # sec
 a_o: float = (k * dx) / dt  # a_o = (rho * c * dx) / Dt
