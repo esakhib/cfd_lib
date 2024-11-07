@@ -161,15 +161,15 @@ while (time_iter <= all_time):
     a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, 0, 0, T_right
     for i in range(1, N - 1):
         if (i == 1):
-            a_w[i] = 2 * k / dx
+            a_w[i] = k / (dx / 2)
             a_e[i] = k / dx
             a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx)
-            b[i] = S_c * dx + a_o * T_current_solution_numerical[i] + T_left
+            b[i] = S_c * dx + a_o * T_current_solution_numerical[i]
         elif (i == N - 2):
             a_w[i] = k / dx
-            a_e[i] = 2 * k / dx
+            a_e[i] = k / (dx / 2)
             a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx)
-            b[i] = S_c * dx + a_o * T_current_solution_numerical[i] + T_right
+            b[i] = S_c * dx + a_o * T_current_solution_numerical[i]
         else:
             a_w[i] = k / dx
             a_e[i] = k / dx
