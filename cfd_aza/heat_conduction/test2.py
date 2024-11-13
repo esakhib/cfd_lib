@@ -164,18 +164,18 @@ b: np.ndarray = np.zeros(shape=N, dtype=float)
 
 time_iter: float = 0.0  # текущее время
 while (time_iter < all_time):
-    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, (2 * T_left)  # учитываем фиктивный к.о.
+    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, q_left * (dx / k)  # учитываем фиктивный к.о.
     a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, -1, 0, (2 * T_right)
 
     for i in range(1, N - 1):
         a_w[i] = k / dx
         a_e[i] = k / dx
         a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx)
-        b[i] = S_c * dx + a_o * T_old_solution[i] + ((q_left + q_right) * dx)
+        b[i] = S_c * dx + a_o * T_old_solution[i] + (q_left * dx)
 
     T_current_solution_numerical = tdma_algorithm(a_p, a_w, a_e, b, N, T_old_solution)  # получаем решение на данном временном шаге
     T_old_solution = T_current_solution_numerical
-    T_current_solution_numerical[0], T_current_solution_numerical[N - 1] = T_left, T_right
+    # T_current_solution_numerical[0], T_current_solution_numerical[N - 1] = T_left, T_right
     T_old_solution_set = np.concatenate((T_old_solution_set, T_current_solution_numerical))  # записываем отдельно все эти решения
 
     print(time_iter, ' sec:  ', T_current_solution_numerical)

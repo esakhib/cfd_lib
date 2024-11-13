@@ -121,18 +121,18 @@ def discrete_analogue(
 
 
 # данные, касающиеся самого тела
-N_origin: int = 5  # количество к.о.
+N_origin: int = 50  # количество к.о.
 N: int = N_origin + 2 # количество к.о. с учетом фиктивных к.о.
 length: float = 10.0  # длина всего предмета, m
-k: float = 1000.0  # коэффициент температуропроводности, m^2 / сек
-T_environment: float = 10.0  # температура окружающей среды, K
-T_left: float = 10.0  # температура слева, K
+k: float = 500.0  # коэффициент температуропроводности, m^2 / сек
+T_environment: float = 20.0  # температура окружающей среды, K
+T_left: float = 50.0  # температура слева, K
 T_right: float = 50.0  # температура справа, K
-h: float = 250.0  # коэффициент теплоотдачи, W / (m^2 * K)
+h: float = 10.0  # коэффициент теплоотдачи, W / (m^2 * K)
 delta: float = 0.1  # m
 dx: float = length / N_origin  # m
 L: np.ndarray = np.arange(start=(-dx/2), stop=length + (dx/2) + delta, step=dx)
-L[0], L[N - 1] = 0, L[N - 1] - (dx/2)
+# L[0], L[N - 1] = 0, L[N - 1] - (dx/2)
 # c: float = main_data.c
 
 # данные, касающиеся времени
@@ -164,18 +164,18 @@ b: np.ndarray = np.zeros(shape=N, dtype=float)
 
 time_iter: float = 0.0  # текущее время
 while (time_iter < all_time):
-    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, (2 * T_left)  # учитываем фиктивный к.о.
+    a_p[0], a_w[0], a_e[0], b[0] = (h * dx - 1), 0, -1, h * dx * T_environment  # учитываем фиктивный к.о.
     a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, -1, 0, (2 * T_right)
 
     for i in range(1, N - 1):
         a_w[i] = k / dx
         a_e[i] = k / dx
-        a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx) + h
-        b[i] = S_c * dx + a_o * T_old_solution[i] + h * T_environment
+        a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx) + (h * dx)
+        b[i] = S_c * dx + a_o * T_old_solution[i] - (h * dx * T_environment)
 
     T_current_solution_numerical = tdma_algorithm(a_p, a_w, a_e, b, N, T_old_solution)  # получаем решение на данном временном шаге
     T_old_solution = T_current_solution_numerical
-    T_current_solution_numerical[0], T_current_solution_numerical[N - 1] = T_left, T_right
+    # T_current_solution_numerical[0], T_current_solution_numerical[N - 1] = T_left, T_right
     T_old_solution_set = np.concatenate((T_old_solution_set, T_current_solution_numerical))  # записываем отдельно все эти решения
 
     print(time_iter, ' sec:  ', T_current_solution_numerical)
