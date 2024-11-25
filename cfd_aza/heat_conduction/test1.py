@@ -200,9 +200,6 @@ while (time_iter < all_time):
     mp.xlabel('Length, [mm]')
     mp.ylabel('Temperature, [°C]')
     mp.title('Numerical solution of heat conductivity')
-    mp.draw()
-    mp.gcf().canvas.flush_events()
-    time.sleep(0.02)
     mp.show()
     time_iter += dt
     i += 1
