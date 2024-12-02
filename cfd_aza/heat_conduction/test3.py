@@ -1,7 +1,6 @@
-import time
-
 import matplotlib.pyplot as mp
 import numpy as np
+from requests import Req
 
 """ 
 ---------------------
@@ -65,35 +64,35 @@ def tdma_algorithm(
 ########################################################################################################################
 
 # выбор режима расчета ГУ: справа, слева, оба одновременно
-request: str = "right"   #  right / left / both
+request = Req.right  #  right / left / both
 
 
 # данные, касающиеся самого тела
 N_origin: int = 50  # количество к.о.
 N: int = N_origin + 2  # количество к.о. с учетом фиктивных к.о.
-length: float = 10.0  # длина всего предмета, m
+length: float = 30.0  # длина всего предмета, m
 k: float = 500.0  # коэффициент температуропроводности, [m^2 / sec]
-alfa: float = -10000.0  # коэффициент теплоотдачи, W / (m^2 * K)
+alfa: float = -100.0  # коэффициент теплоотдачи, W / (m^2 * K)
 c: float = alfa / k
-T_environment: float = 10.0  # температура окружающей среды, [K]
+T_environment: float = 30.0  # температура окружающей среды, [K]
 T_left: float = 50.0  # температура слева, K
-T_right: float = 0.0  # температура справа, K
+T_right: float = 100.0  # температура справа, K
 delta: float = 0.1  # m
 dx: float = length / N_origin  # m
 L: np.ndarray = np.arange(start=(-dx / 2), stop=length + (dx / 2) + delta, step=dx)
 L[0], L[N - 1] = 0, L[N - 1] - (dx/2)
 
 # данные, касающиеся времени
-all_time: float = 40.0  # все рассматриваемое время, sec
-time_steps: int = 5  # количесвто врем промежутков        рассчитать по заданному dt
-dt: float = all_time / (time_steps)  # sec
+all_time: float = 10.0  # все рассматриваемое время, sec
+dt: float = 10.0  # sec
+time_steps: int = int(all_time / dt)  # количество врем промежутков
 a_o: float = k * dx / dt  # a_o = (rho * c * dx) / dt
 
 # линеаризация источника S = S_c + S_p * T[i]
 S_c: float = 0.0
 S_p: float = 0.0
 
-T_init: float = T_left  # начальная температура, K
+T_init: float = T_right  # начальная температура, K
 T_old_solution = T_init * np.ones(shape=N, dtype=float)  # массив для записи решения на старом временном слое
 
 T_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
@@ -110,19 +109,17 @@ b: np.ndarray = np.zeros(shape=N, dtype=float)
 
 # цикл с решением уравнений
 
-time_iter: float = 0.0  # текущее время
-while (time_iter < all_time):
-    if (request == "left"):
-        a_p[0], a_w[0], a_e[0], b[0] = ((c * dx / 2) - 1), 0, (
-                    -(c * dx / 2) - 1), c * dx * T_environment  # учитываем фиктивный к.о.
+time_iter: float = dt  # текущее время
+while (time_iter <= all_time):
+    if (request == Req.left):
+        a_p[0], a_w[0], a_e[0], b[0] = (-(c * dx / 2) - 1), 0, ((c * dx / 2) - 1), -c * dx * T_environment  # учитываем фиктивный к.о.
         a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, -1, 0, (2 * T_right)
 
-    if (request == "right"):
+    if (request == Req.right):
         a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, 2 * T_left  # учитываем фиктивный к
-        a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (
-                    (c * dx / 2) + 1), (1 - (c * dx / 2)), 0, c * dx * T_environment
+        a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (1 - (c * dx / 2)), (1 + (c * dx / 2)), 0, -c * dx * T_environment
 
-    if (request == "both"):
+    if (request == Req.both):
         a_p[0], a_w[0], a_e[0], b[0] = ((c * dx / 2) - 1), 0, (
                     -(c * dx / 2) - 1), c * dx * T_environment  # учитываем фиктивный к
         a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (
@@ -144,6 +141,7 @@ while (time_iter < all_time):
     T_old_solution_set = np.concatenate(
         (T_old_solution_set, T_current_solution_numerical))  # записываем отдельно все эти решения
 
+    print(request.value, "\n")
     print(time_iter, ' sec:  ', T_current_solution_numerical)
     print('         a_p = ', a_p)
     print('         a_e = ', a_e)
@@ -158,9 +156,9 @@ T_old_solution_set = T_old_solution_set.reshape((time_steps, N))
 
 # отрисовка
 
-time_iter: float = 0.0  # текущее время
+time_iter: float = dt  # текущее время
 i: int = 0  # номер итерации
-while (time_iter < all_time):
+while (time_iter <= all_time):
     fig, ax = mp.subplots()
     line, = ax.plot(L, T_old_solution_set[i], "-*m", label='[T] numerical')
     mp.legend()

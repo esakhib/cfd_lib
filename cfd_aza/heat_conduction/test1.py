@@ -1,5 +1,3 @@
-import time
-
 import matplotlib.pyplot as mp
 import numpy as np
 
@@ -62,58 +60,6 @@ def tdma_algorithm(
 
 # -----------------------------------------------------------------------------------------------------------------------
 
-def discrete_analogue(
-        k_arr: np.ndarray,
-        a_p: np.ndarray,
-        a_w: np.ndarray,
-        a_e: np.ndarray,
-        b: np.ndarray,
-        dx: float,
-        S_p: float,
-        a_o: float,
-        S_c: float,
-        temp_arr: np.ndarray,
-        temp_size: int,
-        T_left: float,
-        T_right: float) -> None:
-    """
-    Это функция для коэф дискр аналога,
-    она не используется, т.к. раскрыта
-    в цикле в теле основной программы
-
-    Parameters
-    ----------
-    k_arr
-    a_p
-    a_w
-    a_e
-    b
-    dx
-    S_p
-    a_o
-    S_c
-    temp_arr
-    temp_size
-    T_left
-    T_right
-
-    Returns
-    -------
-
-    """
-    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, 2 * T_left  # коэф для фиктивного к.о.
-    a_p[temp_size - 1], a_w[temp_size - 1], a_e[temp_size - 1], b[temp_size - 1] = 1, -1, 0, 2 * T_right
-    # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 0, T_left  # self.T_old_solution_numerical[0]  # коэф для фиктивного к.о.
-    # a_p[temp_size - 1], a_w[temp_size - 1], a_e[temp_size - 1], b[temp_size - 1] = 1, 0, 0, T_right  # self.T_old_solution_numerical[N - 1]
-    # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 0, 2*T_left/3  # self.T_old_solution_numerical[0]  # коэф для фиктивного к.о.
-    # a_p[temp_size - 1], a_w[temp_size - 1], a_e[temp_size - 1], b[temp_size - 1] = 1, 0, 0, 2*T_right/3  # self.T_old_solution_numerical[N - 1]
-
-    for i in range(1, temp_size - 1):
-        a_w[i] = k_arr[i - 1] / dx
-        a_e[i] = k_arr[i + 1] / dx
-        a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx)
-        b[i] = S_c * dx + a_o * temp_arr[i]
-
 
 ########################################################################################################################
 # тело программы
@@ -122,21 +68,20 @@ def discrete_analogue(
 
 # данные, касающиеся самого тела
 N_origin: int = 5  # количество к.о.
-N: int = N_origin + 2 # количество к.о. с учетом фиктивных к.о.
+N: int = N_origin + 2  # количество к.о. с учетом фиктивных к.о.
 length: float = 10.0  # длина всего предмета, m
 k: float = 1000.0  # коэффициент температуропроводности, m^2 / сек
 T_left: float = 100.0  # температура слева, K
 T_right: float = 500.0  # температура справа, K
 delta: float = 0.1  # m
 dx: float = length / N_origin  # m
-L: np.ndarray = np.arange(start=(-dx/2), stop=length + (dx/2) + delta, step=dx)
-L[0], L[N - 1] = 0, L[N - 1] - (dx/2)
-# c: float = main_data.c
+L: np.ndarray = np.arange(start=(-dx / 2), stop=length + (dx / 2) + delta, step=dx)
+L[0], L[N - 1] = 0, L[N - 1] - (dx / 2)
 
 # данные, касающиеся времени
-all_time: float = 70.0  # все рассматриваемое время, sec
-time_steps: int = 5  # количесвто врем промежутков        рассчитать по заданному dt
-dt: float = all_time / (time_steps)  # sec
+all_time: float = 10.0  # все рассматриваемое время, sec
+dt: float = 10.0  # sec
+time_steps: int = int(all_time / dt)  # количество врем промежутков
 a_o: float = k * dx / dt  # a_o = (rho * c * dx) / dt
 
 # линеаризация источника S = S_c + S_p * T[i]
@@ -144,9 +89,9 @@ S_c: float = 0.0
 S_p: float = 0.0
 
 T_init: float = T_left  # начальная температура, K
-T_old_solution = T_init * np.ones(shape=N, dtype=float) # массив для записи решения на старом временном слое
+T_old_solution = T_init * np.ones(shape=N, dtype=float)  # массив для записи решения на старом временном слое
 
-T_old_solution_set: np.array = np.array([], dtype=float) # массив для записи всех решений
+T_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
 
 k_arr: np.ndarray = np.array([k] * (N + 1), float)  # массив для коэф температуропровондости
 
@@ -160,8 +105,8 @@ b: np.ndarray = np.zeros(shape=N, dtype=float)
 
 # цикл с решением уравнений
 
-time_iter: float = 0.0  # текущее время
-while (time_iter < all_time):
+time_iter: float = dt  # текущее время
+while (time_iter <= all_time):
     a_p[0], a_w[0], a_e[0], b[0] = 1, 0, -1, (2 * T_left)  # учитываем фиктивный к.о.
     a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, -1, 0, (2 * T_right)
 
@@ -171,10 +116,12 @@ while (time_iter < all_time):
         a_p[i] = a_w[i] + a_e[i] + a_o - (S_p * dx)
         b[i] = S_c * dx + a_o * T_old_solution[i]
 
-    T_current_solution_numerical = tdma_algorithm(a_p, a_w, a_e, b, N, T_old_solution)  # получаем решение на данном временном шаге
+    T_current_solution_numerical = tdma_algorithm(a_p, a_w, a_e, b, N,
+                                                  T_old_solution)  # получаем решение на данном временном шаге
     T_old_solution = T_current_solution_numerical
     T_current_solution_numerical[0], T_current_solution_numerical[N - 1] = T_left, T_right
-    T_old_solution_set = np.concatenate((T_old_solution_set, T_current_solution_numerical))  # записываем отдельно все эти решения
+    T_old_solution_set = np.concatenate(
+        (T_old_solution_set, T_current_solution_numerical))  # записываем отдельно все эти решения
 
     print(time_iter, ' sec:  ', T_current_solution_numerical)
     print('         a_p = ', a_p)
@@ -186,14 +133,13 @@ while (time_iter < all_time):
 
 T_old_solution_set = T_old_solution_set.reshape((time_steps, N))
 
-
 # -----------------------------------------------------------------------------------------------------------------------
 
 # отрисовка
 
-time_iter: float = 0.0  # текущее время
+time_iter: float = dt  # текущее время
 i: int = 0  # номер итерации
-while (time_iter < all_time):
+while (time_iter <= all_time):
     fig, ax = mp.subplots()
     line, = ax.plot(L, T_old_solution_set[i], "-*m", label='[T] numerical')
     mp.legend()
