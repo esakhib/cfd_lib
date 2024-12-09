@@ -3,6 +3,7 @@ import logging
 import numpy as np
 
 from solvers.diffusion_convection.discrete_analogue import FiniteVolumeScheme
+from solvers.diffusion_convection.solver_dataclasses import BoundaryType
 from utils.common import timer
 
 
@@ -42,11 +43,13 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         # parse initial and boundary conditions
         self._c_init: float = self._equation_input_data.c_init
-        self._c_left: float = self._equation_input_data.c_left
-        self._c_right: float = self._equation_input_data.c_right
+        self._c_wall_left: float = self._equation_input_data.c_wall_left
+        self._c_wall_right: float = self._equation_input_data.c_wall_right
+        self._q_source = self._equation_input_data.q_source
 
         # list of solutions by each time iteration
         self._solutions: dict = {}
+        self._velocity: dict = {}
 
         # calculate parameters
         dx = self._length / (nx - 1)
@@ -67,9 +70,11 @@ class DiffsuionConvection(FiniteVolumeScheme):
             dy=dy,
             dt=self._dt,
             d=self._d,
-            c_initial_time_value=self._c_init,
-            c_left_condition_value=self._c_left,
-            c_right_condition_value=self._c_right
+            c_initial=self._c_init,
+            c_wall_left=self._c_wall_left,
+            c_wall_right=self._c_wall_right,
+            boundary_type=BoundaryType.Dirichlet,
+            q_source=self._q_source
         )
 
         self._equation_output_data.grid = np.arange(start=0.0, stop=self._length, step=dx)
@@ -77,17 +82,12 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         self._equation_output_data.numerical_solution = self._current_solution
         self._equation_output_data.total_solutions = self._solutions
+        self._equation_output_data.total_velocity = self._velocity
 
         logging.info('End initialization grid and solver data.')
 
-    def _calc_u_sed(self, c: np.ndarray) -> np.ndarray:
-        """Calculate U_sed by C value.
-
-        Returns
-        ----------
-        c: np.ndarray
-            Concentration coefficients.
-
+    def _calc_u_sed(self, c: np.ndarray):
+        """Calculate U_sed by C values.
         """
 
         const = self._equation_input_data.const_u_sed
@@ -98,7 +98,8 @@ class DiffsuionConvection(FiniteVolumeScheme):
         mu2 = self._equation_input_data.mu2
         f_c = self._equation_input_data.f_c
 
-        return const * r0 ** 2.0 * g * (rho1 - rho2) * f_c(c) / mu2
+        for i in np.arange(1, self._nx - 1):
+            self._u_sed[i] = const * r0 ** 2.0 * g * (rho1 - rho2) * f_c((c[i] + c[i + 1]) / 2.0) / mu2
 
     @timer
     def solve_numerical(self):
@@ -116,19 +117,16 @@ class DiffsuionConvection(FiniteVolumeScheme):
         # цикл через временные слои
         while current_time <= self._total_time:
             logging.info(f'Solving for time = {current_time}')
-
-            # задаем ГУ слева и справа
-            self._old_solution[0, 0] = self._c_left
-            self._old_solution[-1, -1] = self._c_right
-
-            # посчитаем скорость, используя концентрацию на текущем временном слое
-            u_sed = self._calc_u_sed(self._old_solution)
-            self.update_u_sed(u_sed)
+            # # посчитаем скорость, используя концентрацию на текущем временном слое
+            # self._calc_u_sed(self._old_solution)
+            # self.update_u_sed()
 
             # инициализиурем дискретный аналог, используя решение на текущем временном слое
-            self.initialize_discrete_analogue(
-                old_time_solution=self._old_solution
-            )
+            self.initialize_discrete_analogue()
+            np.savetxt(f'a_p_{current_time}_sec.txt', self._a_p)
+            np.savetxt(f'a_e_{current_time}_sec.txt', self._a_e)
+            np.savetxt(f'a_w_{current_time}_sec.txt', self._a_w)
+            np.savetxt(f'b_{current_time}_sec.txt', self._b)
 
             # получаем решение на следующем временном слое
             self.solve_equation()
@@ -138,6 +136,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
             # сохраняем решение для временного слоя current_time в словарь
             self._solutions[current_time] = self._current_solution
+            self._velocity[current_time] = self._u_sed
 
             # переключились на следующий временной слой
             current_time += self._dt

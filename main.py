@@ -38,7 +38,7 @@ for current_idx, current_color in needed_items.items():
              f'.-{current_color}',
              markersize=15,
              label=f'Численное решение в момент времени t = {current_idx} сек')
-
+# plt.ylim(0.0258, 0.02585)
 plt.xlabel('Длина L, м', fontsize=20)
 plt.ylabel('Концентрация C', fontsize=20)
 plt.legend(loc='best', prop={'size': 20})
