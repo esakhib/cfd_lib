@@ -1,7 +1,7 @@
 import numpy as np
 
-from solvers.diffusion_convection.solver_dataclasses import BoundaryType
-from solvers.tdma import run_tdma
+from solvers.diffusion_convection.input_data import BoundaryConditionsType
+from utils.tdma import run_tdma
 
 
 class FiniteVolumeScheme:
@@ -16,7 +16,7 @@ class FiniteVolumeScheme:
                  c_wall_left: float,
                  c_wall_right: float,
                  c_initial: float,
-                 boundary_type: BoundaryType,
+                 boundary_type: BoundaryConditionsType,
                  q_source: float):
         """Finite volume method scheme by describing discrete analogue of the equation.
 
@@ -42,7 +42,7 @@ class FiniteVolumeScheme:
             Right boundary condition value for concentration.
         c_initial: float
             Initial condition value for concentration.
-        boundary_type : BoundaryType
+        boundary_type : BoundaryConditionsType
             Boundary condition type.
         q_source : float
             Source value.
@@ -86,14 +86,14 @@ class FiniteVolumeScheme:
 
         self._current_solution: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
         self._old_solution: np.ndarray = np.zeros(shape=(self._nx, self._ny), dtype=np.float64)
-        self._boundary_type: BoundaryType = boundary_type
+        self._boundary_type: BoundaryConditionsType = boundary_type
         self._q_source: float = q_source
 
     def initialize_discrete_analogue(self):
         """Initialize discrete analogue by scheme.
         """
 
-        if self._boundary_type == BoundaryType.Dirichlet:
+        if self._boundary_type == BoundaryConditionsType.Dirichlet:
             self._a_e[0] = -1.0
             self._a_w[0] = 0.0
             self._a_p[0] = 1.0
@@ -104,7 +104,7 @@ class FiniteVolumeScheme:
             self._a_p[self._nx - 1] = 1.0
             self._b[self._nx - 1] = 2.0 * self._c_right_wall
 
-        if self._boundary_type == BoundaryType.Neumann:
+        if self._boundary_type == BoundaryConditionsType.Neumann:
             self._a_e[0] = 1.0
             self._a_w[0] = 0.0
             self._a_p[0] = 1.0
@@ -115,7 +115,7 @@ class FiniteVolumeScheme:
             self._a_p[self._nx - 1] = 1.0
             self._b[self._nx - 1] = self._q_source / self._d_w * self._dx_w
 
-        if self._boundary_type == BoundaryType.Robin:
+        if self._boundary_type == BoundaryConditionsType.Robin:
             self._a_e[0] = 1.0 - self._u_sed_e[0] * self._dx_e / (2.0 * self._d_e)
             self._a_w[0] = 0.0
             self._a_p[0] = 1.0 + self._u_sed_e[0] * self._dx_e / (2.0 * self._d_e)

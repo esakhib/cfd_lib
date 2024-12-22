@@ -14,21 +14,20 @@ def prepare_input_json(save_input_data: bool = False, delete_previous_results: b
 
     Parameters
     ----------
-    save_input_data: bool
+    save_input_data : bool
         Flag to save input data to tem_files folder or not.
-    delete_previous_results: bool
+    delete_previous_results : bool
         Flag to delete previous json files.
 
     Returns
     ----------
-    input_json: str
+    input_json : str
         Input json file.
 
     """
 
     # function prototype for the future
-
-    logging.info('Start preparing input data...')
+    logging.info('Start preparing input data ...')
 
     # convert input data to dict
     input_dict = {}

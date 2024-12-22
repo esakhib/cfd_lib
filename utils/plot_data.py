@@ -7,38 +7,39 @@ from pathlib import Path
 import plotly.graph_objs as go
 
 from utils.common import timer
-from utils.output_dataclasses import OutputData
+from utils.equation_type import SolverOutputData
 
 
 @timer
-def plot_results(results: OutputData, save_output_fig: bool = False, delete_previous_results: bool = True):
+def plot_results(results: SolverOutputData, save_output_fig: bool = False, delete_previous_results: bool = True):
     """Plot plotly graphics.
 
     Parameters
     ----------
-    results: OutputData
+    results : OutputData
         Dataclass with output data.
-    save_output_fig: bool
+    save_output_fig : bool
         Flag to save output figure to figures folder or not.
-    delete_previous_results: bool
+    delete_previous_results : bool
         Flag to delete previous figure file.
 
     Returns
     ----------
-    output_fig:
+    output_fig :
         Output plotly figure.
 
     """
 
-    logging.info('Start plotting results...')
+    logging.info('Start results plotting ...')
 
     output_fig = go.Figure()
 
-    output_fig.add_trace(go.Scatter(x=results.grid,
-                                    y=results.analytical_solution,
-                                    mode='lines+markers',
-                                    name='Analytical solution',
-                                    marker=dict(size=10, color='Black')))
+    if results.analytical_solution.size != 0 and results.analytical_solution is not None:
+        output_fig.add_trace(go.Scatter(x=results.grid,
+                                        y=results.analytical_solution,
+                                        mode='lines+markers',
+                                        name='Analytical solution',
+                                        marker=dict(size=10, color='Black')))
 
     output_fig.add_trace(go.Scatter(x=results.grid,
                                     y=results.numerical_solution.reshape(-1),
@@ -52,7 +53,7 @@ def plot_results(results: OutputData, save_output_fig: bool = False, delete_prev
                              margin=dict(l=0, r=0, t=0, b=0))
 
     output_fig.update_traces(hoverinfo="all",
-                             hovertemplate="Аргумент: %{x}<br>Функция: %{y}")
+                             hovertemplate="Value: %{x}<br>Function: %{y}")
 
     output_fig.show()
 
@@ -72,6 +73,6 @@ def plot_results(results: OutputData, save_output_fig: bool = False, delete_prev
 
         output_fig.write_html(f'figures/{filename}.html')
 
-    logging.info('End plotting results.')
+    logging.info('End results plotting.')
 
     return output_fig

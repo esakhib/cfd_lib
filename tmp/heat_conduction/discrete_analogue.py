@@ -1,6 +1,6 @@
 import numpy as np
 
-from solvers.tdma import run_tdma
+from utils.tdma import run_tdma
 
 
 class FiniteVolumeScheme:

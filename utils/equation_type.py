@@ -1,65 +1,64 @@
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Type
 
 import numpy as np
 
-from solvers.diffusion_convection.solver import DiffsuionConvection
-from solvers.diffusion_convection.solver_dataclasses import InputData as InputDataDC, GridTimeData as GridTimeDataDC
-from solvers.heat_conduction.solver import HeatConductivity
-from solvers.heat_conduction.solver_dataclasses import InputData as InputDataHC, GridTimeData as GridTimeDataHC
+from solvers.diffusion_convection.input_data import InputDataDC, GridTimeDataDC
+from solvers.diffusion_convection.models import DiffusionConvectionSolverModel
+from tmp.heat_conduction.solver import HeatConductivity
+from tmp.heat_conduction.solver_dataclasses import InputDataHC, GridTimeDataHC
 
 
 class EquationTypeEnum(Enum):
-    HEAT_CONDUCTIVITY = 'heat_conductivity'  # 2D unsteady
-    DIFFUSION_CONVECTION = 'diffusion_convection'  # 2D unsteady
+    HEAT_CONDUCTIVITY = 'Heat Conduction'
+    DIFFUSION_CONVECTION = 'Diffusion-Convection'
 
 
 @dataclass
-class EquationData:
-    grid_time_data: dataclass  # domain parameters
-    equation_input_data: dataclass  # physical input data
-    equation_output_data: dataclass  # solution output data
-    equation_solver: Type[HeatConductivity | DiffsuionConvection]  # solver type
-
-
-@dataclass
-class OutputData:
-    time_grid: np.ndarray = field(default_factory=lambda: np.array([]))  # output time grid
-    grid: np.ndarray = field(default_factory=lambda: np.array([]))  # output domain grid
-    numerical_solution: np.ndarray = field(default_factory=lambda: np.array([]))  # output numerical solution
-    analytical_solution: np.ndarray | None = field(default_factory=lambda: np.array([]))  # output analytical solution
+class SolverOutputData:
+    time_scale: np.ndarray = field(default_factory=lambda: np.array([]))  # timescale
+    grid: np.ndarray = field(default_factory=lambda: np.array([]))  # domain grid
+    numerical_solution: np.ndarray = field(default_factory=lambda: np.array([]))  # numerical solution
+    analytical_solution: np.ndarray | None = field(default_factory=lambda: np.array([]))  # analytical solution
     total_solutions: list = field(default_factory=lambda: [])
     total_velocity: list = field(default_factory=lambda: [])
 
 
-def get_input_data_by_equation(equation_type: EquationTypeEnum) -> EquationData | None:
-    """
+@dataclass
+class SolverInputData:
+    grid_time_data: type(GridTimeDataDC) | type(GridTimeDataHC)  # domain parameters
+    equation_input_data: type(InputDataDC) | type(InputDataHC)  # physical input data
+    equation_solver: type[HeatConductivity | DiffusionConvectionSolverModel]  # solver type
+
+
+def get_input_data_by_equation(equation_type: EquationTypeEnum) -> SolverInputData | None:
+    """Get data for current equation.
 
     Parameters
     ----------
-    equation_type
+    equation_type : EquationTypeEnum
+        Equation type.
 
     Returns
     -------
+    SolverInputData | None
+        Input data for current solver.
 
     """
 
     if equation_type == EquationTypeEnum.HEAT_CONDUCTIVITY:
-        return EquationData(
+        return SolverInputData(
             grid_time_data=GridTimeDataHC,
             equation_input_data=InputDataHC,
-            equation_output_data=OutputData,
             equation_solver=HeatConductivity
         )
 
     elif equation_type == EquationTypeEnum.DIFFUSION_CONVECTION:
-        return EquationData(
+        return SolverInputData(
             grid_time_data=GridTimeDataDC,
             equation_input_data=InputDataDC,
-            equation_output_data=OutputData,
-            equation_solver=DiffsuionConvection
+            equation_solver=DiffusionConvectionSolverModel
         )
 
     else:

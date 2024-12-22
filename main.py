@@ -10,19 +10,17 @@ logging.getLogger().setLevel(logging.INFO)
 equation_type = EquationTypeEnum.DIFFUSION_CONVECTION
 
 # gat data for solving equation
-input_data = get_input_data_by_equation(equation_type=equation_type)
+input_data = get_input_data_by_equation(
+    equation_type=equation_type
+)
 
 # initialize the equation
-equation = input_data.equation_solver(input_data=input_data)
-
-# solve analytical
-# equation.solve_analytical()
+equation = input_data.equation_solver(
+    input_data=input_data
+)
 
 # solve numerical
 equation.solve_numerical()
-
-# plot results
-# _ = plot_results(results=equation.output_data, save_output_fig=True, delete_previous_results=True)
 
 time_keys = list(equation.output_data.total_solutions.keys())
 needed_items = {0: 'k', 2: 'b', 4: 'r', 6: 'y', 8: 'm'}
@@ -38,7 +36,6 @@ for current_idx, current_color in needed_items.items():
              f'.-{current_color}',
              markersize=15,
              label=f'Численное решение в момент времени t = {current_idx} сек')
-# plt.ylim(0.0258, 0.02585)
 plt.xlabel('Длина L, м', fontsize=20)
 plt.ylabel('Концентрация C', fontsize=20)
 plt.legend(loc='best', prop={'size': 20})

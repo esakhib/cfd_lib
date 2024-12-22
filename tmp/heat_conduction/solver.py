@@ -3,7 +3,7 @@ import warnings
 
 import numpy as np
 
-from solvers.heat_conduction.discrete_analogue import FiniteVolumeScheme
+from tmp.heat_conduction.discrete_analogue import FiniteVolumeScheme
 from utils.common import timer
 
 
@@ -84,7 +84,7 @@ class HeatConductivity(FiniteVolumeScheme):
         self._k = self._equation_input_data.k
 
         if self._k is None:
-            lambda_coef = self._equation_input_data.lambda_coef
+            lambda_coef = self._equation_input_data.lambda_coefficient
             rho = self._equation_input_data.rho
             cp = self._equation_input_data.cp
 

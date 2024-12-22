@@ -2,8 +2,8 @@ import logging
 
 import numpy as np
 
-from solvers.diffusion_convection.discrete_analogue import FiniteVolumeScheme
-from solvers.diffusion_convection.solver_dataclasses import BoundaryType
+from tmp.discrete_analogue import FiniteVolumeScheme
+from solvers.diffusion_convection.input_data import BoundaryConditionsType
 from utils.common import timer
 
 
@@ -43,8 +43,8 @@ class DiffsuionConvection(FiniteVolumeScheme):
 
         # parse initial and boundary conditions
         self._c_init: float = self._equation_input_data.c_init
-        self._c_wall_left: float = self._equation_input_data.c_wall_left
-        self._c_wall_right: float = self._equation_input_data.c_wall_right
+        self._c_wall_left: float = self._equation_input_data.c_left
+        self._c_wall_right: float = self._equation_input_data.c_right
         self._q_source = self._equation_input_data.q_source
 
         # list of solutions by each time iteration
@@ -73,7 +73,7 @@ class DiffsuionConvection(FiniteVolumeScheme):
             c_initial=self._c_init,
             c_wall_left=self._c_wall_left,
             c_wall_right=self._c_wall_right,
-            boundary_type=BoundaryType.Dirichlet,
+            boundary_type=BoundaryConditionsType.Dirichlet,
             q_source=self._q_source
         )
 

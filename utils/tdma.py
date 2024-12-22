@@ -1,11 +1,10 @@
 import numpy as np
 
 
-# import numba as nb
-# from numba import guvectorize, float64, prange, njit
+# from numba import njit, prange
 
 
-# @guvectorize([(float64[:],) * 5], '(n), (n), (n), (n) -> (n)', nopython=False, target_backend=True)
+# @njit
 def run_tdma(a: np.ndarray, b: np.ndarray, c: np.ndarray, d: np.ndarray):
     """TDMA algorithm using numba.
 
@@ -19,8 +18,6 @@ def run_tdma(a: np.ndarray, b: np.ndarray, c: np.ndarray, d: np.ndarray):
         Lower diagonal values.
     d: np.ndarray
         Right-side vector.
-    result: np.ndarray
-        Result vector.
 
     """
 
