@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-from solvers.diffusion_convection.input_data import GridTimeDataDC, InputDataDC
+from solvers.diffusion_convection.input_data import GridTimeDataDiffusionConvection, InputDataDiffusionConvection
 from utils.boundary_type import BoundaryConditionsModel, BoundaryConditionsType
 from utils.common import timer
 from utils.equation_type import SolverInputData, SolverOutputData
@@ -18,7 +18,7 @@ class FiniteVolumeModel:
         self._solver_input_data: SolverInputData = solver_input_data
 
         # grid & time scale input data
-        self._grid_time_data: GridTimeDataDC = self._solver_input_data.grid_time_data
+        self._grid_time_data: GridTimeDataDiffusionConvection = self._solver_input_data.grid_time_data
 
         self._length: float = self._grid_time_data.x_length
         self._height: float = self._grid_time_data.y_height
@@ -127,7 +127,7 @@ class PhysicsModel:
         self._fvm_model: FiniteVolumeModel = fvm_model
 
         # equation input data
-        self._equation_input_data: InputDataDC = self._solver_input_data.equation_input_data
+        self._equation_input_data: InputDataDiffusionConvection = self._solver_input_data.equation_input_data
 
         # boundary conditions model
         self._boundary_conditions_model: BoundaryConditionsModel = self._equation_input_data.boundary_conditions_model

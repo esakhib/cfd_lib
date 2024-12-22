@@ -11,7 +11,7 @@ def f_c(c: float) -> float:
 
 
 @dataclass
-class GridTimeDataDC:
+class GridTimeDataDiffusionConvection:
     nx: int = 10
     ny: int = 1
 
@@ -23,7 +23,7 @@ class GridTimeDataDC:
 
 
 @dataclass
-class InputDataDC:
+class InputDataDiffusionConvection:
     sc: float = 0.0  # s = sc + sp * Cp
     sp: float = 0.0  # s = sc + sp * Cp
 
@@ -54,4 +54,3 @@ class InputDataDC:
             lower_side=None
         )
     )
-

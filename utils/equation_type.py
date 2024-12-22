@@ -4,10 +4,8 @@ from enum import Enum
 
 import numpy as np
 
-from solvers.diffusion_convection.input_data import InputDataDC, GridTimeDataDC
+from solvers.diffusion_convection.input_data import InputDataDiffusionConvection, GridTimeDataDiffusionConvection
 from solvers.diffusion_convection.models import DiffusionConvectionSolverModel
-from tmp.heat_conduction.solver import HeatConductivity
-from tmp.heat_conduction.solver_dataclasses import InputDataHC, GridTimeDataHC
 
 
 class EquationTypeEnum(Enum):
@@ -27,9 +25,9 @@ class SolverOutputData:
 
 @dataclass
 class SolverInputData:
-    grid_time_data: type(GridTimeDataDC) | type(GridTimeDataHC)  # domain parameters
-    equation_input_data: type(InputDataDC) | type(InputDataHC)  # physical input data
-    equation_solver: type[HeatConductivity | DiffusionConvectionSolverModel]  # solver type
+    grid_time_data: type(GridTimeDataDiffusionConvection)  # domain parameters
+    equation_input_data: type(InputDataDiffusionConvection)  # physical input data
+    equation_solver: type(DiffusionConvectionSolverModel)  # solver type
 
 
 def get_input_data_by_equation(equation_type: EquationTypeEnum) -> SolverInputData | None:
@@ -47,19 +45,22 @@ def get_input_data_by_equation(equation_type: EquationTypeEnum) -> SolverInputDa
 
     """
 
-    if equation_type == EquationTypeEnum.HEAT_CONDUCTIVITY:
+    if equation_type == EquationTypeEnum.DIFFUSION_CONVECTION:
         return SolverInputData(
-            grid_time_data=GridTimeDataHC,
-            equation_input_data=InputDataHC,
-            equation_solver=HeatConductivity
-        )
-
-    elif equation_type == EquationTypeEnum.DIFFUSION_CONVECTION:
-        return SolverInputData(
-            grid_time_data=GridTimeDataDC,
-            equation_input_data=InputDataDC,
+            grid_time_data=GridTimeDataDiffusionConvection,
+            equation_input_data=InputDataDiffusionConvection,
             equation_solver=DiffusionConvectionSolverModel
         )
+
+    elif equation_type == EquationTypeEnum.HEAT_CONDUCTIVITY:
+        # return SolverInputData(
+        #     grid_time_data=GridTimeDataHC,
+        #     equation_input_data=InputDataHC,
+        #     equation_solver=HeatConductivity
+        # )
+
+        logging.warning('This equation type is not implemented yet.')
+        return None
 
     else:
         logging.warning('Unknown equation type! Please, check input data and try again.')
