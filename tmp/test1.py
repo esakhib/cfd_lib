@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.constants import g
 
-from solvers.diffusion_convection.solver_dataclasses import BoundaryType
-from solvers.tdma import run_tdma
+from solvers.diffusion_convection.input_data import BoundaryConditionsType
+from utils.tdma import run_tdma
 
 os.environ["XDG_SESSION_TYPE"] = "xcb"
 
@@ -65,7 +65,7 @@ velocity = {}
 grid = np.arange(start=0.0, stop=x_length, step=dx)
 grid = np.append(grid, x_length)
 
-boundary_type: BoundaryType = BoundaryType.Robin  # тип ГУ
+boundary_type: BoundaryConditionsType = BoundaryConditionsType.Robin  # тип ГУ
 dx_e = dx_w = dx  # шаг сетки
 d_e = d_w = d  # коэф-т диффузии
 current_time = 0.0  # начальное время

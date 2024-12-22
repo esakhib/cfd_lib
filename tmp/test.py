@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.constants import g
 
-from solvers.diffusion_convection.solver_dataclasses import BoundaryType
-from solvers.tdma import run_tdma
+from solvers.diffusion_convection.input_data import BoundaryConditionsType
+from utils.tdma import run_tdma
 
 os.environ["XDG_SESSION_TYPE"] = "xcb"
 
@@ -70,7 +70,7 @@ grid = np.append(grid, x_length)
 grid[1] = grid[1] / 2.0
 grid[-2] = grid[-2] / 2.0
 
-boundary_type: BoundaryType = BoundaryType.Dirichlet  # тип ГУ
+boundary_type: BoundaryConditionsType = BoundaryConditionsType.Dirichlet  # тип ГУ
 dx_e = dx_w = dx  # шаг сетки
 d_e = d_w = d  # коэф-т диффузии
 current_time = 0.0  # начальное время
@@ -109,7 +109,7 @@ while current_time <= total_time:
     # b[nx - 1] = 0.0
 
     # инициализиурем дискретный аналог, используя решение на текущем временном слое
-    if boundary_type == BoundaryType.Dirichlet:
+    if boundary_type == BoundaryConditionsType.Dirichlet:
         a_e[0] = -1.0
         a_w[0] = 0.0
         a_p[0] = 1.0

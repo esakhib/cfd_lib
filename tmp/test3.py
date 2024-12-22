@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.constants import g
 
-from solvers.diffusion_convection.solver_dataclasses import BoundaryType
-from solvers.tdma import run_tdma
+from utils.tdma import run_tdma
 
 os.environ["XDG_SESSION_TYPE"] = "xcb"
 
@@ -17,7 +16,7 @@ def f_c(c: float) -> float:
 
 def calc_u_sed(u_sed: np.ndarray, c: np.ndarray):
     const_u_sed = 0.2  # 2 / 9
-    r0: float = 0.001  # m
+    r0: float = 0.01  # m
     rho1: float = 1000.0  # kg / m^3
     rho2: float = 900.0  # kg / m^3
     mu2: float = 0.6  # Pa * sec
@@ -39,8 +38,7 @@ dx: float = x_length / (nx - 1)
 dy: float = 1.0
 dt: float = total_time / (nt - 1)
 
-c_init: float = 0.0  # НУ
-c_left_wall: float = 0.5  # левое ГУ (I рода)
+c_init: float = 0.5  # НУ
 d: float = 1E-6  # diffusion coefficient, m^2 / sec  9.46E-19
 
 # элементы КО
@@ -65,7 +63,6 @@ velocity = {}
 grid = np.arange(start=0.0, stop=x_length, step=dx)
 grid = np.append(grid, x_length)
 
-boundary_type: BoundaryType = BoundaryType.Robin  # тип ГУ
 dx_e = dx_w = dx  # шаг сетки
 d_e = d_w = d  # коэф-т диффузии
 current_time = 0.0  # начальное время
@@ -74,7 +71,7 @@ current_time = 0.0  # начальное время
 # решение на предыдущем временном слое
 old_solution = np.full_like(current_solution, c_init)
 
-u_sed[:, :] = 1E-12  # velocity, m/sec
+u_sed[:, :] = 0  # velocity, m/sec
 
 # цикл через временные слои
 while current_time <= total_time:
@@ -89,11 +86,11 @@ while current_time <= total_time:
     # обновим скорость
     u_sed_e = u_sed_w = u_sed
 
-    # boundary_type == BoundaryType.Dirichlet
-    a_e[0] = -1.0
+    # boundary_type == BoundaryType.Robin
+    a_e[0] = 1.0 - u_sed_e[0] * dx_e / (2.0 * d_e)
     a_w[0] = 0.0
-    a_p[0] = 1.0
-    b[0] = 2.0 * c_left_wall
+    a_p[0] = 1.0 + u_sed_e[0] * dx_e / (2.0 * d_e)
+    b[0] = 0.0
 
     # boundary_type == BoundaryType.Robin
     a_e[nx - 1] = 0.0
@@ -152,7 +149,7 @@ plt.plot(grid,
          label=f'Численное решение в момент времени t = {list(solutions.keys())[0]} сек')
 
 plt.plot(grid,
-         list(solutions.values())[-1].reshape(-1),
+         list(solutions.values())[1].reshape(-1),
          marker='.',
          c=next(cycol),
          markersize=15,
@@ -179,6 +176,7 @@ plt.plot(grid,
          markersize=15,
          label=f'Численное решение в момент времени t = {list(solutions.keys())[-1]} сек')
 
+# plt.ylim(0.0, max_c)
 plt.xlabel('Длина L, м', fontsize=20)
 plt.ylabel('Концентрация C', fontsize=20)
 plt.legend(loc='best', prop={'size': 20})
