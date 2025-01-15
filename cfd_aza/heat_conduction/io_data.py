@@ -1,5 +1,28 @@
 from dataclasses import dataclass
 import numpy as np
+from enum import Enum
+
+# TODO: add c (specific heat) and rho (density) coefficients
+# TODO: add Sp and Sc for source linearizing
+
+@dataclass
+class InputData:
+    N: int
+    length: float
+    T_init: float
+    k: float
+    T_left: float | None
+    T_right: float | None
+    q: float | None
+    q_left: float | None
+    q_right: float | None
+    T_env: float | None
+    h: float | None
+
+
+class OutputData:
+    T_current_solution_numerical: np.ndarray
+    L: np.ndarray
 
 
 @dataclass
@@ -8,12 +31,8 @@ class Dirichlet: #prescribed temperature
     length: float
     T_left: float
     T_right: float
+    T_init: float
     k: float
-    #c: float    # specific heat [const]
-    #rho: float    # density
-    # These are for thermal source linearization S = S_c + S_p * T[i]
-    # S_p: float
-    # S_c: float
 
 
 
@@ -21,30 +40,26 @@ class Dirichlet: #prescribed temperature
 class Neumann: #specified heat flux condition
     N: int
     length: float
+    T_init: float
     k: float
-    c: float
-    rho: float
-    T_left: float
-    T_right: float
-    q: float
+    q: float | None
+    q_left: float | None
+    q_right: float | None
 
 
 @dataclass
 class Robin: #convection boundary condition
     N: int
     length: float
-    k: float
-    c: float
-    rho: float
-    h: float
     T_env: float
-    T_flat: float
+    T_init: float
+    k: float
+    h: float
 
 
 
-class OutputData:
-    T_current_solution_numerical = np.ndarray
-    L = np.ndarray
+
+
 
 
 

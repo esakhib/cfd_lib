@@ -76,7 +76,7 @@ alfa: float = -100.0  # коэффициент теплоотдачи, W / (m^2 
 c: float = alfa / k
 T_environment: float = 30.0  # температура окружающей среды, [K]
 T_left: float = 50.0  # температура слева, K
-T_right: float = 100.0  # температура справа, K
+T_right: float = 50.0  # температура справа, K
 delta: float = 0.1  # m
 dx: float = length / N_origin  # m
 L: np.ndarray = np.arange(start=(-dx / 2), stop=length + (dx / 2) + delta, step=dx)
@@ -84,7 +84,7 @@ L[0], L[N - 1] = 0, L[N - 1] - (dx/2)
 
 # данные, касающиеся времени
 all_time: float = 10.0  # все рассматриваемое время, sec
-dt: float = 10.0  # sec
+dt: float = 2.0  # sec
 time_steps: int = int(all_time / dt)  # количество врем промежутков
 a_o: float = k * dx / dt  # a_o = (rho * c * dx) / dt
 

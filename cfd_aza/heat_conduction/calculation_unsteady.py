@@ -6,8 +6,8 @@ from cfd_aza.heat_conduction.analytical_solver import analytical_formula
 
 
 class Solutions:
-    def __init__(self, main_data, T_old_solution_numerical):
-        '''
+    def __init__(self, main_data, boundary_condition):
+        """
           Solving the task of one-dimension non-stationary heat conductivity
                  with discrete analogue - TDMA.
           --------------------------------------------------------------
@@ -31,15 +31,21 @@ class Solutions:
                L: np.ndarray  - array with control volumes
           --------------------------------------------------------------
 
-        '''
+        """
 
         self._N: int = main_data.N
         self._length: float = main_data.length
         self._k: float = main_data.k
-        self._T_left: float = main_data.T_left
-        self._T_right: float = main_data.T_right
-        # self._c: float = main_data.c
-        # self._rho: float = main_data.rho
+        self._T_init: float = main_data.T_init
+        self._T_left: float | None = main_data.T_left
+        self._T_right: float | None = main_data.T_right
+        self._q: float | None = main_data.q  # если не задана одна из сторон, то приравнять к соответсвующей стороне
+                                             # если заданы обе стороны, то эта переменная не используется
+        self._q_left: float | None = main_data.q_left
+        self._q_right: float | None = main_data.q_right
+        self._T_env: float | None = main_data.T_env
+        self._h: float | None = main_data._h
+
 
         self._time: float = 10
         self._N_time: int = 5

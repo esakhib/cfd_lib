@@ -1,11 +1,23 @@
 from cfd_aza.heat_conduction.io_data import *
 from cfd_aza.heat_conduction.calculation_unsteady import *
+from cfd_aza.heat_conduction.init import BoundaryCondition
 #from cfd_aza.visual.plotting import *
 
 import matplotlib.pyplot as mp
 import time
 
 
+# main_data = InputData(
+#                N = 5,
+#                length = 10,
+#                T_init = 30,
+#                T_right = 100,
+#                T_left = 20,
+#                k = 5)
+
+# boundary_condition = BoundaryCondition(
+#                          left_side = BoundaryType.Dirichlet,
+#                          right_side = BoundaryType.Dirichlet)
 
 main_data = Dirichlet(N = 5, length = 10, T_right = 100, T_left = 20, k = 5)
 
