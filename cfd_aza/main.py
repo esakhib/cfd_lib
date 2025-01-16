@@ -1,5 +1,5 @@
-from cfd_aza.heat_conduction.io_data import *
-from cfd_aza.heat_conduction.calculation_unsteady import *
+from cfd_aza.heat_conduction.inout_data import *
+from cfd_aza.heat_conduction.prep_data import *
 from cfd_aza.heat_conduction.init import BoundaryCondition
 #from cfd_aza.visual.plotting import *
 
@@ -7,13 +7,17 @@ import matplotlib.pyplot as mp
 import time
 
 
-# main_data = InputData(
+# input_data = InputData(
 #                N = 5,
 #                length = 10,
 #                T_init = 30,
 #                T_right = 100,
 #                T_left = 20,
 #                k = 5)
+
+# time_data = TimeData(
+#                all_time = 10.0,
+#                delta_time = 2.0)
 
 # boundary_condition = BoundaryCondition(
 #                          left_side = BoundaryType.Dirichlet,

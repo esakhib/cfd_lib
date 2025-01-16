@@ -19,10 +19,14 @@ class InputData:
     T_env: float | None
     h: float | None
 
+@dataclass
+class TimeData:
+    all_time: float
+    delta_time: float
+
 
 class OutputData:
     T_current_solution_numerical: np.ndarray
-    L: np.ndarray
 
 
 @dataclass
