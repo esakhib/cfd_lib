@@ -1,53 +1,67 @@
-from cfd_aza.heat_conduction.inout_data import *
-from cfd_aza.heat_conduction.prep_data import *
-from cfd_aza.heat_conduction.init import BoundaryCondition
+from cfd_aza.solvers.heat_conduction.inout_data import InputData
+from cfd_aza.solvers.heat_conduction.inout_data import TimeData
+from cfd_aza.solvers.heat_conduction.inout_data import OutputData
+
+from cfd_aza.solvers.heat_conduction.solver import HeatConductivity
+
+from cfd_aza.solvers.heat_conduction.init import BoundaryCondition
+from cfd_aza.solvers.heat_conduction.init import BoundaryType
 #from cfd_aza.visual.plotting import *
 
 import matplotlib.pyplot as mp
-import time
 
 
-# input_data = InputData(
-#                N = 5,
-#                length = 10,
-#                T_init = 30,
-#                T_right = 100,
-#                T_left = 20,
-#                k = 5)
+input_data = InputData(
+    N = 5,
+    length = 10,
+    T_init = 30,
+    T_right = 0,
+    T_left = 50,
+    k = 5,
+    q = 0,
+    q_left = 0,
+    q_right = 50,
+    T_env = 0,
+    h = 0,
+)
 
-# time_data = TimeData(
-#                all_time = 10.0,
-#                delta_time = 2.0)
+time_data = TimeData(
+    all_time = 10.0,
+    delta_time = 2.0
+)
 
-# boundary_condition = BoundaryCondition(
-#                          left_side = BoundaryType.Dirichlet,
-#                          right_side = BoundaryType.Dirichlet)
+boundary_condition = BoundaryCondition(
+    left_side = BoundaryType.Dirichlet,
+    right_side = BoundaryType.Neumann
+)
 
-main_data = Dirichlet(N = 5, length = 10, T_right = 100, T_left = 20, k = 5)
-
-T_old_solution_numerical = main_data.T_left * np.ones(shape = main_data.N, dtype = float)
-equation = Solutions(main_data = main_data, T_old_solution_numerical = T_old_solution_numerical)
+equation = HeatConductivity(
+    input_data = input_data,
+    time_data = time_data,
+    boundary_condition = boundary_condition
+)
 
 output_data = OutputData()
-output_data.L = equation.L
-#output_data.T_analytical = equation.analytical_solution()
 
 
+T_old_solution_set = equation.time_solver()
 
-for i in range(0, equation.N_time):
+
+# отрисовка
+
+time_iter: float = time_data.delta_time  # текущее время
+i: int = 0  # номер итерации
+while (time_iter <= time_data.all_time):
     fig, ax = mp.subplots()
-    output_data.T_current_solution_numerical = equation.thomas_solution()
-    line, = ax.plot(output_data.L, output_data.T_current_solution_numerical, "-*m", label='[T] numerical')
+    line, = ax.plot(equation.L, T_old_solution_set[i], "-*m", label='[T] numerical')
     mp.legend()
     mp.xlabel('Length, [mm]')
     mp.ylabel('Temperature, [°C]')
     mp.title('Numerical solution of heat conductivity')
-    mp.draw()
-    mp.gcf().canvas.flush_events()
-    time.sleep(0.02)
+    mp.axis('scaled')
     mp.show()
-    equation = Solutions(main_data = main_data, T_old_solution_numerical = output_data.T_current_solution_numerical)
-
+    time_iter += time_data.delta_time
+    i += 1
 
 
 
