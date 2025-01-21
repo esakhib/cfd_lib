@@ -1,6 +1,6 @@
 import numpy as np
 
-from cfd_aza.solvers.TDMA_solver import tdma_algorithm
+from cfd_aza.solvers.TDMA import tdma_algorithm
 from cfd_aza.solvers.heat_conduction.init import BoundaryType
 
 
@@ -11,26 +11,33 @@ class HeatConductivity:
                  time_data):
 
         """
-          Solving the task of one-dimension non-stationary heat conductivity
+          Solving the task of one-dimension unsteady heat conductivity
                  with discrete analogue - TDMA.
           --------------------------------------------------------------
           Parameters:
                N: int  - quantity of control volumes
-               length: float  - length of whole thing
-               k: float  - coefficient of heat conductivity [const]
-               T_left: float  - left boundary condition of temperature
-               T_right: float  - right boundary condition of temperature
+               length: float  - length of whole thing, [m]
+               k: float  - coefficient of heat conductivity [const], [m^2 / sec]
+               T_left: float  - left boundary condition of temperature, [K]
+               T_right: float  - right boundary condition of temperature, [K]
+               q_left: float  - heat flux from left side, [W / m^2]
+               q_right: float  - heat flux from right side, [W / m^2]
+               T_env: float  - temperature of environment, [K]
+               h: float  - heat-transfer coefficient, [W / (m^2 * K)]
 
-               T_current_solution_numerical: np.ndarray  - array with numerical solutions for each control volume at This time
-               T_current_solution_analytical: np.ndarray  - array with analytical solutions for each control volume at This time
-               T_old_solution_numerical: np.ndarray  - array with numerical solutions for each control volume at Last time
+               T_current_solution: np.ndarray  - array with numerical solutions for each control volume at This time
+               T_solution: np.ndarray  - array with numerical solutions for each control volume at Last time
+               T_solution_set: np.ndarray  - multidimensional array with all numerical solutions
                a, b, c, d: np.ndarray  - arrays with coefficients of discrete analogue
                                          for each control volume
           --------------------------------------------------------------
           Extra parameters:
-               dx: float  - length of control volume
-               dt: float  - time step interval
-               delta: float  - extra length just for correct program working
+               dt: float  - time step interval, [sec]
+               all_time: float  - all considering time, [sec]
+               time_steps: int  - quantity of time steps
+
+               dx: float  - length of control volume, [m]
+               delta: float  - extra length just for correct program working, [m]
                L: np.ndarray  - array with control volumes
           --------------------------------------------------------------
 
@@ -46,52 +53,53 @@ class HeatConductivity:
         self._T_init: float = input_data.T_init
         self._T_left: float = input_data.T_left
         self._T_right: float = input_data.T_right
-        self._q: float = input_data.q  # если не задана одна из сторон, то приравнять к соответсвующей стороне
-                                             # если заданы обе стороны, то эта переменная не используется
         self._q_left: float = input_data.q_left
         self._q_right: float = input_data.q_right
         self._T_environment: float = input_data.T_env
         self._h: float = input_data.h
-        self._c: float = self._h / self._k
 
-        self._delta: float = 0.1  # m
-        self._dx: float = self._length / self._N_origin  # m
-        self._L: np.ndarray = np.arange(
-            start=(-self._dx / 2),
-            stop=self._length + (self._dx / 2) + self._delta,
-            step=self._dx)
-        self._L[0], self._L[self._N - 1] = 0, self._L[self._N - 1] - (self._dx / 2)
+        # TODO: add Sp and Sc for source linearizing
+        # linearize temperature source S = S_c + S_p * T[i]
+        self._S_c = 0
+        self._S_p = 0
 
-        # данные, касающиеся времени
-        self._all_time: float = time_data.all_time  # все рассматриваемое время, sec
-        self._dt: float = time_data.delta_time  # sec
-        self._time_steps: int = int(self._all_time / self._dt)  # количество врем промежутков
-        self._a_o: float = self._k * self._dx / self._dt  # a_o = (rho * c * dx) / dt
+        # TODO: add k coefficient calculation when it is not [const]
+        # array filled with coefficient of heat conductivity for each control volume
+        self._k_arr: np.ndarray = np.array([self._k] * (self._N + 1), float)
+
+        self._a_p: np.ndarray = np.zeros(shape=self._N, dtype=float)
+        self._a_e: np.ndarray = np.zeros(shape=self._N, dtype=float)
+        self._a_w: np.ndarray = np.zeros(shape=self._N, dtype=float)
+        self._b: np.ndarray = np.zeros(shape=self._N, dtype=float)
 
         self._T_solution: np.ndarray = np.zeros(shape=self._N, dtype=float)
         self._T_solution = np.full_like(self._T_solution, self._T_init)
 
         self._T_solution_set: np.array = np.array([], dtype=float)
 
-        # array filled with coefficient of heat conductivity for each control volume
-        self._k_arr: np.ndarray = np.array([self._k] * (self._N + 1), float)
+        # length calculations
+        self._delta: float = 0.1
+        self._dx: float = self._length / self._N_origin
+        self._L: np.ndarray = np.arange(
+            start=(-self._dx / 2),
+            stop=self._length + (self._dx / 2) + self._delta,
+            step=self._dx)
+        self._L[0], self._L[self._N - 1] = 0, self._L[self._N - 1] - (self._dx / 2)
 
-        self._a_p: np.ndarray = np.zeros(shape = self._N, dtype = float)
-        self._a_e: np.ndarray = np.zeros(shape = self._N, dtype = float)
-        self._a_w: np.ndarray = np.zeros(shape = self._N, dtype = float)
-        self._b: np.ndarray = np.zeros(shape = self._N, dtype = float)
-        
-        
-        # TODO: add Sp and Sc for source linearizing
-        #linearize temperature source S = S_c + S_p * T[i]
-        self._S_c = 0
-        self._S_p = 0
+        # time calculations
+        self._all_time: float = time_data.all_time
+        self._dt: float = time_data.delta_time
+        self._time_steps: int = int(self._all_time / self._dt)
 
+        # extra variables for correct program working
+        self._a_o: float = self._k * self._dx / self._dt  # a_o = (rho * c * dx) / dt
+        self._c: float = self._h / self._k
 
     def apply_bndry_cond(self):
 
         """ Get coefficients with rule of discrete analogue """
 
+        # calculation boundary coefficients on left side
         if (self._left_side == BoundaryType.Dirichlet):
             self._a_p[0] = 1
             self._a_w[0] = 0
@@ -108,6 +116,7 @@ class HeatConductivity:
             self._a_e[0] = (self._c * self._dx / 2) - 1
             self._b[0] = -self._c * self._dx * self._T_environment
 
+        # calculation boundary coefficients on right side
         if (self._right_side == BoundaryType.Dirichlet):
             self._a_p[self._N - 1] = 1
             self._a_w[self._N - 1] = -1
@@ -124,15 +133,14 @@ class HeatConductivity:
             self._a_e[self._N - 1] = 0
             self._b[self._N - 1] = -self._c * self._dx * self._T_environment
 
+        # calculation the rest coefficients with rule of discrete analogue
         for i in range(1, self._N - 1):
             self._a_w[i] = self._k / self._dx
             self._a_e[i] = self._k / self._dx
             self._a_p[i] = self._a_w[i] + self._a_e[i] + self._a_o - (self._S_p * self._dx)
             self._b[i] = self._S_c * self._dx + self._a_o * self._T_solution[i]
 
-
-
-    def thomas_solution(self):
+    def tdma_solver(self):
 
         """ Get solution with TDMA """
 
@@ -145,21 +153,23 @@ class HeatConductivity:
 
         return self._T_solution
 
-
     def time_solver(self):
 
         """ Get solutions in time """
 
         self._time_iter: float = self._dt
+
         while (self._time_iter <= self._all_time):
             self.apply_bndry_cond()
-            self._T_current_solution = self.thomas_solution()
+            self._T_current_solution = self.tdma_solver()
             self._T_solution = np.copy(self._T_current_solution)
-            # получаем температуру на крайних точках, опуская фиктивные к.о.
+
+            # get temperature on endpoints deleting fictitious control volumes
             self._T_current_solution[0] = (self._T_current_solution[0] + self._T_current_solution[1]) / 2
             self._T_current_solution[self._N - 1] = (self._T_current_solution[self._N - 2] + self._T_current_solution[
                 self._N - 1]) / 2
 
+            # record all solutions
             self._T_solution_set = np.concatenate(
                 (self._T_solution_set, self._T_current_solution))  # записываем отдельно все эти решения
 
@@ -168,7 +178,6 @@ class HeatConductivity:
         self._T_solution_set = self._T_solution_set.reshape((self._time_steps, self._N))
 
         return self._T_solution_set
-
 
     @property
     def L(self):

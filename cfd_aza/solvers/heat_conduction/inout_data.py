@@ -13,7 +13,6 @@ class InputData:
     k: float
     T_left: float
     T_right: float
-    q: float
     q_left: float
     q_right: float
     T_env: float
