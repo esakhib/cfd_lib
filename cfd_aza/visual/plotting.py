@@ -6,6 +6,14 @@ class Visual:
     def __init__(self, output_data):
         """
           Visualising the task
+          --------------------------------------------------------------
+          Parameters:
+               solution_set: np.ndarray  - multidimensional array with all numerical solutions
+               L: np.ndarray  - array with control volumes
+               delta_time: float  - time step interval, [sec]
+               all_time: float  - all considering time, [sec]
+          --------------------------------------------------------------
+
         """
         self._solution_set: np.ndarray = output_data.solution_set
         self._L: np.ndarray = output_data.L
@@ -13,7 +21,7 @@ class Visual:
         self._all_time: float = output_data.all_time
 
 
-    def plotting(self):
+    def plotting(self) -> None:
         self._time_iter: float = self._delta_time
         self._i: int = 0
         while (self._time_iter <= self._all_time):

@@ -6,10 +6,10 @@ def tdma_algorithm(a: np.ndarray,
            d: np.ndarray,
            N: int,
            T: np.ndarray) -> None:
-    '''
-      Numerical solution for one-dimension unsteady heat conductivity
+    """
+      Numerical solution for one-dimensional task
          with TDMA (Thomas-algorithm)
-    '''
+    """
 
     P = np.zeros(N)
     Q = np.zeros(N)

@@ -140,7 +140,7 @@ class HeatConductivity:
             self._a_p[i] = self._a_w[i] + self._a_e[i] + self._a_o - (self._S_p * self._dx)
             self._b[i] = self._S_c * self._dx + self._a_o * self._T_solution[i]
 
-    def tdma_solver(self):
+    def tdma_solver(self) -> np.ndarray:
 
         """ Get solution with TDMA """
 
@@ -153,7 +153,7 @@ class HeatConductivity:
 
         return self._T_solution
 
-    def time_solver(self):
+    def time_solver(self) -> np.ndarray:
 
         """ Get solutions in time """
 
@@ -180,5 +180,5 @@ class HeatConductivity:
         return self._T_solution_set
 
     @property
-    def L(self):
+    def L(self) -> np.ndarray:
         return self._L

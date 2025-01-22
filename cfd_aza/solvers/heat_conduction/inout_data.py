@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 import numpy as np
-from enum import Enum
 
 # TODO: add c (specific heat) and rho (density) coefficients
 # TODO: add Sp and Sc for source linearizing
