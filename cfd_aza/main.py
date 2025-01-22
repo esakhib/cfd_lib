@@ -4,8 +4,8 @@ from cfd_aza.solvers.heat_conduction.inout_data import OutputData
 
 from cfd_aza.solvers.heat_conduction.solver import HeatConductivity
 
-from cfd_aza.solvers.heat_conduction.init import BoundaryCondition
-from cfd_aza.solvers.heat_conduction.init import BoundaryType
+from cfd_aza.solvers.init import BoundaryCondition
+from cfd_aza.solvers.init import BoundaryType
 
 from cfd_aza.visual.plotting import Visual
 

@@ -1,7 +1,7 @@
 import numpy as np
 
 from cfd_aza.solvers.TDMA import tdma_algorithm
-from cfd_aza.solvers.heat_conduction.init import BoundaryType
+from cfd_aza.solvers.init import BoundaryType
 
 
 class HeatConductivity:
