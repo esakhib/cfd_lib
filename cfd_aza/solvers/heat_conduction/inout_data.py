@@ -23,6 +23,10 @@ class TimeData:
     all_time: float
     delta_time: float
 
+@dataclass
 class OutputData:
-    T_solution_set: np.ndarray
+    solution_set: np.ndarray
+    L: np.ndarray
+    delta_time: float
+    all_time: float
 
