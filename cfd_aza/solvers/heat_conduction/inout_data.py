@@ -5,7 +5,7 @@ import numpy as np
 # TODO: add Sp and Sc for source linearizing
 
 @dataclass
-class InputData:
+class InputDataHeatConductivity:
     N: int
     length: float
     T_init: float
