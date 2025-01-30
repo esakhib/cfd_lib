@@ -5,7 +5,7 @@ def tdma_algorithm(a: np.ndarray,
            c: np.ndarray,
            d: np.ndarray,
            N: int,
-           T: np.ndarray) -> None:
+           T: np.ndarray) -> np.ndarray:
     """
       Numerical solution for one-dimensional task
          with TDMA (Thomas-algorithm)
@@ -22,3 +22,5 @@ def tdma_algorithm(a: np.ndarray,
     T[N - 1] = Q[N - 1]
     for i in range(N - 1, 0, -1):
         T[i - 1] = P[i - 1] * T[i] + Q[i - 1]
+
+    return T

@@ -75,7 +75,9 @@ class HeatConductivity:
         self._T_solution: np.ndarray = np.zeros(shape=self._N, dtype=float)
         self._T_solution = np.full_like(self._T_solution, self._T_init)
 
-        self._T_solution_set: np.array = np.array([], dtype=float)
+        self._T_solution_set: np.ndarray = np.array([], dtype=float)
+
+        self._T_current_solution: np.ndarray = np.zeros(shape=self._N, dtype=float)
 
         # length calculations
         self._delta: float = 0.1
@@ -90,6 +92,7 @@ class HeatConductivity:
         self._all_time: float = time_data.all_time
         self._dt: float = time_data.delta_time
         self._time_steps: int = int(self._all_time / self._dt)
+        self._time_iter: float = 0.0
 
         # extra variables for correct program working
         self._a_o: float = self._k * self._dx / self._dt  # a_o = (rho * c * dx) / dt
@@ -144,12 +147,12 @@ class HeatConductivity:
 
         """ Get solution with TDMA """
 
-        tdma_algorithm(self._a_p,
-                       self._a_e,
-                       self._a_w,
-                       self._b,
-                       self._N,
-                       self._T_solution)
+        self._T_solution = tdma_algorithm(self._a_p,
+                                          self._a_e,
+                                          self._a_w,
+                                          self._b,
+                                          self._N,
+                                          self._T_solution)
 
         return self._T_solution
 
@@ -157,7 +160,7 @@ class HeatConductivity:
 
         """ Get solutions in time """
 
-        self._time_iter: float = self._dt
+        self._time_iter = self._dt
 
         while (self._time_iter <= self._all_time):
             self.apply_bndry_cond()

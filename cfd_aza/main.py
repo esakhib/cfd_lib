@@ -11,7 +11,6 @@ from cfd_aza.visual.plotting import Visual
 
 
 
-
 input_data = InputDataHeatConductivity(
     N = 5,
     length = 10,
@@ -27,7 +26,7 @@ input_data = InputDataHeatConductivity(
 
 time_data = TimeData(
     all_time = 10.0,
-    delta_time = 5.0
+    delta_time = 2.0
 )
 
 boundary_condition = BoundaryCondition(
@@ -52,4 +51,4 @@ output_data = OutputData(
 )
 
 plotting = Visual(output_data = output_data)
-plotting.plotting()
+plotting.plot_data()

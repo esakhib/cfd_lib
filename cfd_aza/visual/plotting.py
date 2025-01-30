@@ -20,8 +20,11 @@ class Visual:
         self._delta_time: float = output_data.delta_time
         self._all_time: float = output_data.all_time
 
+        self._time_iter: float = 0.0
+        self._i: int = 0
 
-    def plotting(self) -> None:
+
+    def plot_data(self) -> None:
         self._time_iter: float = self._delta_time
         self._i: int = 0
         while (self._time_iter <= self._all_time):
