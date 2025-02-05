@@ -157,8 +157,8 @@ while (time_iter <= all_time):
     line, = ax.plot(L, C_old_solution_set[i], "-*m", label='[T] numerical')
     mp.legend()
     mp.xlabel('Length, [mm]')
-    mp.ylabel('Temperature, [°C]')
-    mp.title('Numerical solution of heat conductivity')
+    mp.ylabel('Concentration')
+    mp.title('Numerical solution of diffusion')
     mp.show()
     time_iter += dt
     i += 1
