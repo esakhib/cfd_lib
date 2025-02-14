@@ -96,10 +96,14 @@ C_old_solution = C_init * np.ones(shape=N, dtype=float)  # массив для �
 C_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
 
 # данные, касающиеся времени
-all_time: float = 10000.0  # все рассматриваемое время, sec
-dt: float = 2000  # sec
+all_time: float = 100.0  # все рассматриваемое время, sec
+dt: float = 1  # sec
+AAAA: float = 20
 time_steps: int = int(all_time / dt)  # количество врем промежутков
 a_o: float = dz / dt
+
+integral = np.zeros(shape=time_steps + 2, dtype=float)
+integral[0] = np.sum(C_old_solution * dz)
 
 # массивы для коэф дискретного аналога
 a_p: np.ndarray = np.zeros(shape=N, dtype=float)
@@ -113,20 +117,19 @@ b: np.ndarray = np.zeros(shape=N, dtype=float)
 
 time_iter: float = dt  # текущее время
 while (time_iter <= all_time):
-    # rho = rho_partical * C_old_solution[N - 1] + rho_fluid * (1 - C_old_solution[N - 1])
-    C = np.sum(C_old_solution) / N
-    print("C = ", C)
-    rho = rho_partical * C + rho_fluid * (1 - C)
+    rho = rho_partical * C_old_solution[N - 1] + rho_fluid * (1 - C_old_solution[N - 1])
+    # C = np.sum(C_old_solution) / N
+    # print("C = ", C)
+    # rho = rho_partical * C + rho_fluid * (1 - C)
     f = rho_partical / rho
     a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f) * v)), 0, (D / dz), C_o * (1 - f) * v  # учитываем фиктивный к.о.
     a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz), ((D / dz) + ((1 - f) * v)), 0, -C_o * (1 - f) * v
 
 
-
     for i in range(1, N - 1):
-        # rho = rho_partical * C_old_solution[i] + rho_fluid * (1 - C_old_solution[i])
-        C = np.sum(C_old_solution) / N_origin
-        rho = rho_partical * C + rho_fluid * (1 - C)
+        rho = rho_partical * C_old_solution[i] + rho_fluid * (1 - C_old_solution[i])
+        # C = np.sum(C_old_solution) / N_origin
+        # rho = rho_partical * C + rho_fluid * (1 - C)
         f = rho_partical / rho
         a_w[i] = D / dz + v * (1 - f)
         a_e[i] = D / dz
@@ -140,12 +143,14 @@ while (time_iter <= all_time):
     C_current_solution_numerical[N - 1] = (C_current_solution_numerical[N - 2] + C_current_solution_numerical[
         N - 1]) / 2
 
-    # if (time_iter % 200 == 0):
-    #     C_old_solution_set = np.concatenate(
-    #         (C_old_solution_set, C_current_solution_numerical))  # записываем отдельно все эти решения
+    if (time_iter % AAAA == 0):
+        C_old_solution_set = np.concatenate(
+            (C_old_solution_set, C_current_solution_numerical))  # записываем отдельно все эти решения
 
-    C_old_solution_set = np.concatenate(
-        (C_old_solution_set, C_current_solution_numerical))  # записываем отдельно все эти решения
+
+    print("time_iter = ", time_iter)
+    print("time_iter//dt = ", time_iter//dt)
+    integral[time_iter//dt] = np.sum(C_old_solution * dz)
 
     print(time_iter, ' sec:  ', C_current_solution_numerical)
     print('         a_p = ', a_p)
@@ -155,14 +160,17 @@ while (time_iter <= all_time):
     print('\n\n')
     time_iter += dt
 
-# C_old_solution_set = C_old_solution_set.reshape((time_steps // 10, N))
-C_old_solution_set = C_old_solution_set.reshape((time_steps, N))
+
+C_old_solution_set = C_old_solution_set.reshape((time_steps // AAAA, N))
+# C_old_solution_set = C_old_solution_set.reshape((time_steps, N))
+
+print("integral = ", integral)
 
 # -----------------------------------------------------------------------------------------------------------------------
 
 # отрисовка
 
-time_iter: float = dt  # текущее время
+time_iter: float = 0  # текущее время
 i: int = 0  # номер итерации
 while (time_iter <= all_time):
     fig, ax = mp.subplots()
