@@ -71,7 +71,7 @@ top = 'dirichlet'
 bottom = 'neumann'
 
 # данные, касающиеся самой системы
-N_origin: int = 100  # количество к.о.
+N_origin: int = 10  # количество к.о.
 N: int = N_origin + 2  # количество к.о. с учетом фиктивных к.о.
 length: float = 0.010  # длина всего объекта, m
 delta: float = 0.000001  # m
@@ -83,12 +83,13 @@ r: float = 2e-6  # радиус частицы
 rho_partical: float = 1070  # плотность частицы
 rho_fluid: float = 1000  # плотность жидкости
 myu: float = 1e-4  # коэффициент вязкости
-D: float = 1e-9 # коэффициент диффузии
+D: float = 1e-10 # коэффициент диффузии
 g: float = 9.81  # ускорение свободного падения
 v: float = -(2 / 9) * r ** 2 * g * ((rho_partical - rho_fluid) / myu)
 print("v = ", v)
 
 C_o: float = 0
+q = 0
 
 C_init: float = 0.1  # начальная концентрация
 C_old_solution = C_init * np.ones(shape=N, dtype=float)  # массив для записи решения на старом временном слое
@@ -96,9 +97,9 @@ C_old_solution = C_init * np.ones(shape=N, dtype=float)  # массив для �
 C_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
 
 # данные, касающиеся времени
-all_time: float = 100.0  # все рассматриваемое время, sec
+all_time: float = 100000.0  # все рассматриваемое время, sec
 dt: float = 1  # sec
-AAAA: float = 20
+AAAA: float = 10000
 time_steps: int = int(all_time / dt)  # количество врем промежутков
 a_o: float = dz / dt
 
@@ -115,23 +116,22 @@ b: np.ndarray = np.zeros(shape=N, dtype=float)
 
 # цикл с решением уравнений
 
-time_iter: float = dt  # текущее время
+concentration: np.ndarray = np.zeros(int(all_time / AAAA) + 1)
+time_arr: np.ndarray = np.linspace(AAAA, all_time + AAAA, int(all_time / AAAA) + 1)
+iter = 0
+time_iter: float = 0  # текущее время
 while (time_iter <= all_time):
-    rho = rho_partical * C_old_solution[N - 1] + rho_fluid * (1 - C_old_solution[N - 1])
-    # C = np.sum(C_old_solution) / N
-    # print("C = ", C)
-    # rho = rho_partical * C + rho_fluid * (1 - C)
+
+    rho = rho_partical * C_old_solution + rho_fluid * (1 - C_old_solution)
     f = rho_partical / rho
-    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f) * v)), 0, (D / dz), C_o * (1 - f) * v  # учитываем фиктивный к.о.
-    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz), ((D / dz) + ((1 - f) * v)), 0, -C_o * (1 - f) * v
+
+    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * v)), 0, (D / dz), C_o * (1 - f[0]) * v  # учитываем фиктивный к.о.
+    # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, -q  # учитываем фиктивный к.о.
+    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz), ((D / dz) + ((1 - f[N - 1]) * v)), 0, -C_o * (1 - f[N - 1]) * v
 
 
     for i in range(1, N - 1):
-        rho = rho_partical * C_old_solution[i] + rho_fluid * (1 - C_old_solution[i])
-        # C = np.sum(C_old_solution) / N_origin
-        # rho = rho_partical * C + rho_fluid * (1 - C)
-        f = rho_partical / rho
-        a_w[i] = D / dz + v * (1 - f)
+        a_w[i] = D / dz + v * (1 - f[i])
         a_e[i] = D / dz
         a_p[i] = a_w[i] + a_e[i] + a_o
         b[i] = a_o * C_old_solution[i]
@@ -143,45 +143,58 @@ while (time_iter <= all_time):
     C_current_solution_numerical[N - 1] = (C_current_solution_numerical[N - 2] + C_current_solution_numerical[
         N - 1]) / 2
 
+
     if (time_iter % AAAA == 0):
         C_old_solution_set = np.concatenate(
             (C_old_solution_set, C_current_solution_numerical))  # записываем отдельно все эти решения
+        concentration[iter] = np.sum(C_current_solution_numerical) / N
+        iter += 1
+        print("concentration = ", np.sum(C_current_solution_numerical) / N)
+        # print("                ", C_current_solution_numerical)
 
 
-    print("time_iter = ", time_iter)
-    print("time_iter//dt = ", time_iter//dt)
+
+    # print("time_iter = ", time_iter)
+    # print("time_iter//dt = ", time_iter//dt)
     integral[time_iter//dt] = np.sum(C_old_solution * dz)
 
-    print(time_iter, ' sec:  ', C_current_solution_numerical)
-    print('         a_p = ', a_p)
-    print('         a_e = ', a_e)
-    print('         a_w = ', a_w)
-    print('         b = ', b)
-    print('\n\n')
+    # print(time_iter, ' sec:  ', C_current_solution_numerical)
+    # print('         a_p = ', a_p)
+    # print('         a_e = ', a_e)
+    # print('         a_w = ', a_w)
+    # print('         b = ', b)
+    # print('\n\n')
     time_iter += dt
 
 
-C_old_solution_set = C_old_solution_set.reshape((time_steps // AAAA, N))
+C_old_solution_set = C_old_solution_set.reshape((time_steps // AAAA + 1, N))
 # C_old_solution_set = C_old_solution_set.reshape((time_steps, N))
 
 print("integral = ", integral)
+
 
 # -----------------------------------------------------------------------------------------------------------------------
 
 # отрисовка
 
-time_iter: float = 0  # текущее время
-i: int = 0  # номер итерации
-while (time_iter <= all_time):
-    fig, ax = mp.subplots()
-    line, = ax.plot(L, C_old_solution_set[i], "-*m", label='[T] numerical')
-    mp.legend()
-    mp.xlabel('Length, [m]')
-    mp.ylabel('Concentration')
-    mp.title('Numerical solution of diffusion')
-    #mp.axis('scaled')
-    mp.show()
-    time_iter += dt
-    i += 1
+# time_iter: float = 0  # текущее время
+# i: int = 0  # номер итерации
+# while (time_iter <= all_time):
+#     fig, ax = mp.subplots()
+#     line, = ax.plot(L, C_old_solution_set[i], "-*m", label='[T] numerical')
+#     mp.legend()
+#     mp.xlabel('Length, [m]')
+#     mp.ylabel('Concentration')
+#     mp.title('Numerical solution of diffusion')
+#     # mp.axis('scaled')
+#     mp.show()
+#     time_iter += dt
+#     i += 1
+
+mp.plot(time_arr, concentration, "-*m", label='численное решение')
+mp.legend()
+mp.xlabel('время')
+mp.ylabel('средняя концентрация')
+mp.show()
 
 ########################################################################################################################
