@@ -86,6 +86,7 @@ myu: float = 1e-4  # коэффициент вязкости
 D: float = 1e-10 # коэффициент диффузии
 g: float = 9.81  # ускорение свободного падения
 v: float = -(2 / 9) * r ** 2 * g * ((rho_partical - rho_fluid) / myu)
+V: np.ndarray = np.zeros(shape=N, dtype=float)
 print("v = ", v)
 
 C_top: float = 0
@@ -124,14 +125,17 @@ while (time_iter <= all_time):
 
     rho = rho_partical * C_old_solution + rho_fluid * (1 - C_old_solution)
     f = rho_partical / rho
+    V = (1 - C_old_solution ** 2) * v
 
-    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * v / 2)), 0, ((D / dz) - ((1 - f[0]) * v / 2)), C_top * (1 - f[0]) * v  # учитываем фиктивный к.о.
-    # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, C_top  # учитываем фиктивный к.о.
-    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz) - ((1 - f[N - 1]) * v / 2), ((D / dz) + ((1 - f[N - 1]) * v / 2)), 0, -C_bottom * (1 - f[N - 1]) * v
-    # a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, 1, 0, C_bottom  # учитываем фиктивный к.о.
+    # a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * V[0] / 2)), 0, (D / dz), C_top * (1 - f[0]) * V[0]  # учитываем фиктивный к.о.
+    # # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, C_top  # учитываем фиктивный к.о.
+    # a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz), ((D / dz) + ((1 - f[N - 1]) * V[N - 1])), 0, -C_bottom * (1 - f[N - 1]) * V[N - 1]
+    # # a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, 1, 0, C_bottom  # учитываем фиктивный к.о.
+    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * V[0] / 2)), 0, ((D / dz) - ((1 - f[0]) * V[0] / 2)), C_top * (1 - f[0]) * V[0]  # учитываем фиктивный к.о.
+    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz) - ((1 - f[N - 1]) * V[N - 1] / 2), ((D / dz) + ((1 - f[N - 1]) * V[N - 1] / 2)), 0, -C_bottom * (1 - f[N - 1]) * V[N - 1]
 
     for i in range(1, N - 1):
-        a_w[i] = D / dz + v * (1 - f[i])
+        a_w[i] = D / dz + V[i] * (1 - f[i])
         a_e[i] = D / dz
         a_p[i] = a_w[i] + a_e[i] + a_o
         b[i] = a_o * C_old_solution[i]
