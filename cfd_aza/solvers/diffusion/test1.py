@@ -88,8 +88,8 @@ g: float = 9.81  # ускорение свободного падения
 v: float = -(2 / 9) * r ** 2 * g * ((rho_partical - rho_fluid) / myu)
 print("v = ", v)
 
-C_top: float = 0
-C_bottom: float = 0
+C_o: float = 0
+q = 0
 
 C_init: float = 0.1  # начальная концентрация
 C_old_solution = C_init * np.ones(shape=N, dtype=float)  # массив для записи решения на старом временном слое
@@ -125,10 +125,10 @@ while (time_iter <= all_time):
     rho = rho_partical * C_old_solution + rho_fluid * (1 - C_old_solution)
     f = rho_partical / rho
 
-    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * v / 2)), 0, ((D / dz) - ((1 - f[0]) * v / 2)), C_top * (1 - f[0]) * v  # учитываем фиктивный к.о.
-    # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, C_top  # учитываем фиктивный к.о.
-    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz) - ((1 - f[N - 1]) * v / 2), ((D / dz) + ((1 - f[N - 1]) * v / 2)), 0, -C_bottom * (1 - f[N - 1]) * v
-    # a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, 1, 0, C_bottom  # учитываем фиктивный к.о.
+    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * v)), 0, (D / dz), C_o * (1 - f[0]) * v  # учитываем фиктивный к.о.
+    # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, -q  # учитываем фиктивный к.о.
+    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz), ((D / dz) + ((1 - f[N - 1]) * v)), 0, -C_o * (1 - f[N - 1]) * v
+
 
     for i in range(1, N - 1):
         a_w[i] = D / dz + v * (1 - f[i])
@@ -156,10 +156,7 @@ while (time_iter <= all_time):
 
     # print("time_iter = ", time_iter)
     # print("time_iter//dt = ", time_iter//dt)
-    integral[time_iter // dt] = 0
-    for i in range(1, N - 2):
-        integral[time_iter // dt] += C_old_solution[i] * dz
-        # integral[time_iter//dt] = np.sum(C_old_solution * dz)
+    integral[time_iter//dt] = np.sum(C_old_solution * dz)
 
     # print(time_iter, ' sec:  ', C_current_solution_numerical)
     # print('         a_p = ', a_p)
@@ -183,16 +180,16 @@ print("integral = ", integral)
 time_iter: float = 0  # текущее время
 i: int = 0  # номер итерации
 while (time_iter <= all_time):
-    fig, ax = mp.subplots()
-    line, = ax.plot(L, C_old_solution_set[i], "-*m", label='[T] numerical')
-    mp.legend()
-    mp.xlabel('Length, [m]')
-    mp.ylabel('Concentration')
-    mp.title('Numerical solution of diffusion')
-    # mp.axis('scaled')
-    mp.show()
-    time_iter += dt
+    mp.plot(L, C_old_solution_set[i], "-*", label='%d сек' % (time_iter))
+    time_iter += AAAA
     i += 1
+
+mp.legend()
+mp.xlabel('Length, [m]')
+mp.ylabel('Concentration')
+mp.title('Numerical solution of diffusion')
+# mp.axis('scaled')
+mp.show()
 
 # mp.plot(time_arr, concentration, "-*m", label='численное решение')
 # mp.legend()

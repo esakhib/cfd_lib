@@ -187,16 +187,16 @@ print("integral = ", integral)
 time_iter: float = 0  # текущее время
 i: int = 0  # номер итерации
 while (time_iter <= all_time):
-    fig, ax = mp.subplots()
-    line, = ax.plot(L, C_old_solution_set[i], "-*m", label='[T] numerical')
-    mp.legend()
-    mp.xlabel('Length, [m]')
-    mp.ylabel('Concentration')
-    mp.title('Numerical solution of diffusion')
-    # mp.axis('scaled')
-    mp.show()
-    time_iter += dt
+    mp.plot(L, C_old_solution_set[i], "-*", label='%d сек' % (time_iter))
+    time_iter += AAAA
     i += 1
+
+mp.legend()
+mp.xlabel('Length, [m]')
+mp.ylabel('Concentration')
+mp.title('Numerical solution of diffusion')
+# mp.axis('scaled')
+mp.show()
 
 # mp.plot(time_arr, concentration, "-*m", label='численное решение')
 # mp.legend()
