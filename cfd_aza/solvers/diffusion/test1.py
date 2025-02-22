@@ -88,7 +88,8 @@ g: float = 9.81  # ускорение свободного падения
 v: float = -(2 / 9) * r ** 2 * g * ((rho_partical - rho_fluid) / myu)
 print("v = ", v)
 
-C_o: float = 0
+C_top: float = 0
+C_bottom: float = 0
 q = 0
 
 C_init: float = 0.1  # начальная концентрация
@@ -97,11 +98,24 @@ C_old_solution = C_init * np.ones(shape=N, dtype=float)  # массив для �
 C_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
 
 # данные, касающиеся времени
-all_time: float = 100000.0  # все рассматриваемое время, sec
-dt: float = 1  # sec
-AAAA: float = 20000
-time_steps: int = int(all_time / dt)  # количество врем промежутков
+all_time: float = 30000.0  # все рассматриваемое время, sec
+dt: float = 1  # шаг по времени для расчета, sec
+time_steps: int = int(all_time / dt)  # количество врем промеж-в для расчета
 a_o: float = dz / dt
+
+# ДАННЫЕ ДЛЯ ОТРИСОВКИ ПО ЗАДАННОМУ ВРЕМЕННОМУ ШАГУ
+# AAAA: float = 6000  # шаг по времени для отрисовки
+# FFF = time_steps // AAAA + 1  # количество врем промеж-в для отрисовки
+
+# ДАННЫЕ ДЛЯ ОТРИСОВКИ В ОПРЕДЕЛЕННОМ ВРЕМ-ОМ ПРОМЕЖ-КЕ ПО ЗАДАННОМУ КОЛИЧЕСТВУ ВРЕМ-Х ПРОМЕЖ-В
+BBB: float = 5
+Start: float = 2000
+End: float = 20000
+AAAA: float = (End - Start) / BBB  # шаг по времени для отрисовки
+FFF = BBB  # количество врем промеж-в для отрисовки
+
+
+
 
 integral = np.zeros(shape=time_steps + 2, dtype=float)
 integral[0] = np.sum(C_old_solution * dz)
@@ -125,13 +139,13 @@ while (time_iter <= all_time):
     rho = rho_partical * C_old_solution + rho_fluid * (1 - C_old_solution)
     f = rho_partical / rho
 
-    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * v)), 0, (D / dz), C_o * (1 - f[0]) * v  # учитываем фиктивный к.о.
+    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * v)), 0, (D / dz), C_top * (1 - f[0]) * v  # учитываем фиктивный к.о.
     # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, -q  # учитываем фиктивный к.о.
-    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz), ((D / dz) + ((1 - f[N - 1]) * v)), 0, -C_o * (1 - f[N - 1]) * v
+    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz), ((D / dz) + ((1 - f[N - 1]) * v)), 0, -C_bottom * (1 - f[N - 1]) * v
 
 
     for i in range(1, N - 1):
-        a_w[i] = D / dz + v * (1 - f[i])
+        a_w[i] = (D / dz) + (v * (1 - f[i]))
         a_e[i] = D / dz
         a_p[i] = a_w[i] + a_e[i] + a_o
         b[i] = a_o * C_old_solution[i]
@@ -143,8 +157,8 @@ while (time_iter <= all_time):
     C_current_solution_numerical[N - 1] = (C_current_solution_numerical[N - 2] + C_current_solution_numerical[
         N - 1]) / 2
 
-
-    if (time_iter % AAAA == 0):
+    # if (time_iter % AAAA == 0):
+    if (time_iter % AAAA == 0) and (time_iter >= Start) and (time_iter <= End):
         C_old_solution_set = np.concatenate(
             (C_old_solution_set, C_current_solution_numerical))  # записываем отдельно все эти решения
         concentration[iter] = np.sum(C_current_solution_numerical) / N
@@ -167,7 +181,7 @@ while (time_iter <= all_time):
     time_iter += dt
 
 
-C_old_solution_set = C_old_solution_set.reshape((time_steps // AAAA + 1, N))
+C_old_solution_set = C_old_solution_set.reshape((FFF, N))
 # C_old_solution_set = C_old_solution_set.reshape((time_steps, N))
 
 print("integral = ", integral)
@@ -177,9 +191,16 @@ print("integral = ", integral)
 
 # отрисовка
 
-time_iter: float = 0  # текущее время
+# time_iter: float = 0  # текущее время
+# i: int = 0  # номер итерации
+# while (time_iter <= all_time):
+#     mp.plot(L, C_old_solution_set[i], "-*", label='%d сек' % (time_iter))
+#     time_iter += AAAA
+#     i += 1
+
+time_iter: float = Start  # текущее время
 i: int = 0  # номер итерации
-while (time_iter <= all_time):
+while (time_iter < End):
     mp.plot(L, C_old_solution_set[i], "-*", label='%d сек' % (time_iter))
     time_iter += AAAA
     i += 1
