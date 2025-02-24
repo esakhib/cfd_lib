@@ -71,16 +71,16 @@ top = 'dirichlet'
 bottom = 'neumann'
 
 # данные, касающиеся самой системы
-N_origin: int = 40  # количество к.о.
+N_origin: int = 70  # количество к.о.
 N: int = N_origin + 2  # количество к.о. с учетом фиктивных к.о.
-length: float = 0.010  # длина всего объекта, m
+length: float = 0.01  # длина всего объекта, m
 delta: float = 0.000001  # m
 dz: float = length / N_origin  # m
 L: np.ndarray = np.arange(start=(-dz / 2), stop=length + (dz / 2) + delta, step=dz)
 L[0], L[N - 1] = 0, L[N - 1] - (dz / 2)
 
 r: float = 2e-6  # радиус частицы
-rho_partical: float = 1300  # плотность частицы
+rho_partical: float = 1080  # плотность частицы
 rho_fluid: float = 1000  # плотность жидкости
 myu: float = 1e-4  # коэффициент вязкости
 D: float = 1e-10 # коэффициент диффузии
@@ -98,9 +98,9 @@ C_old_solution = (C_init / N) * np.ones(shape=N, dtype=float)  # массив д
 C_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
 
 # данные, касающиеся времени
-all_time: float = 50000.0  # все рассматриваемое время, sec
+all_time: float = 100000.0  # все рассматриваемое время, sec
 dt: float = 1  # sec
-AAAA: float = 10000
+AAAA: float = 20000
 time_steps: int = int(all_time / dt)  # количество врем промежутков
 a_o: float = dz / dt
 
@@ -125,7 +125,7 @@ while (time_iter <= all_time):
 
     rho = rho_partical * C_old_solution + rho_fluid * (1 - C_old_solution)
     f = rho_partical / rho
-    V = abs(C_init - C_old_solution) * v
+    V = (1 - (C_old_solution/C_init)) * v
 
     # a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * V[0] / 2)), 0, (D / dz), C_top * (1 - f[0]) * V[0]  # учитываем фиктивный к.о.
     # # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, C_top  # учитываем фиктивный к.о.
