@@ -83,14 +83,14 @@ r: float = 2e-6  # радиус частицы
 rho_partical: float = 1080  # плотность частицы
 rho_fluid: float = 1000  # плотность жидкости
 myu: float = 1e-4  # коэффициент вязкости
-D: float = 1e-10 # коэффициент диффузии
+D: float = 1e-9 # коэффициент диффузии
 g: float = 9.81  # ускорение свободного падения
 v: float = -(2 / 9) * r ** 2 * g * ((rho_partical - rho_fluid) / myu)
 V: np.ndarray = v * np.ones(shape=N, dtype=float)
 print("v = ", v)
 
 C_top: float = 0.0
-C_bottom: float = 1.0
+C_bottom: float = 0.0
 
 C_init: float = 0.4  # начальная концентрация
 C_old_solution = (C_init) * np.ones(shape=N, dtype=float)  # массив для записи решения на старом временном слое
@@ -98,9 +98,9 @@ C_old_solution = (C_init) * np.ones(shape=N, dtype=float)  # массив для
 C_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
 
 # данные, касающиеся времени
-all_time: float = 100000.0  # все рассматриваемое время, sec
+all_time: float = 11000.0  # все рассматриваемое время, sec
 dt: float = 1  # sec
-AAAA: float = 20000
+AAAA: float = 1000
 time_steps: int = int(all_time / dt)  # количество врем промежутков
 a_o: float = dz / dt
 
@@ -132,8 +132,8 @@ while (time_iter <= all_time):
     # a_p[0], a_w[0], a_e[0], b[0] = 1, 0, 1, C_top  # учитываем фиктивный к.о.
     # a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (D / dz), ((D / dz) + ((1 - f[N - 1]) * V[N - 1])), 0, -C_bottom * (1 - f[N - 1]) * V[N - 1]
     # a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, 1, 0, C_bottom  # учитываем фиктивный к.о.
-    a_p[0], a_w[0], a_e[0], b[0] = ((D / dz) + ((1 - f[0]) * V[0] / 2)), 0, ((D / dz) - ((1 - f[0]) * V[0] / 2)), C_top * V[0]  # учитываем фиктивный к.о.
-    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (-D / dz) - ((1 - f[N - 1]) * V[N - 1] / 2), ((-D / dz) + ((1 - f[N - 1]) * V[N - 1] / 2)), 0, -C_bottom * (1 - f[N - 1]) * V[N - 1]
+    a_p[0], a_w[0], a_e[0], b[0] = 1, 0, abs(D / (D + dz * (1 - f[0]) * V[0])), 0  # учитываем фиктивный к.о.
+    a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = 1, abs((D + dz * (1 - f[N - 1]) * V[N - 2]) / D), 0, 0
 
     for i in range(1, N - 1):
         a_w[i] = D / dz + V[i] * (1 - f[i])
