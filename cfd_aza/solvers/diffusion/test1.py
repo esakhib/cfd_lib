@@ -74,17 +74,17 @@ def tdma_algorithm(
 # данные, касающиеся самой системы
 N_origin: int = 10  # количество к.о.
 N: int = N_origin + 2  # количество к.о. с учетом фиктивных к.о.
-length: float = 0.005  # длина всего объекта, m
-delta: float = 0.000001  # m
+length: float = 0.03  # длина всего объекта, m
+delta: float = 0.1  # m
 dz: float = length / N_origin  # m
 L: np.ndarray = np.arange(start=(-dz / 2), stop=length + (dz / 2) + delta, step=dz)
-L[0], L[N - 1] = 0, L[N - 1] - (dz / 2)
+L[1], L[N - 2] = 0, L[N - 1] - (dz / 2)
 
-r: float = 2e-6  # радиус частицы, m
-rho_partical: float = 1100  # плотность частицы, kg / m^3
+r: float = 1e-6  # радиус частицы, m
+rho_partical: float = 1200  # плотность частицы, kg / m^3
 rho_fluid: float = 1000  # плотность жидкости, kg / m^3
 myu: float = 1e-4  # коэффициент вязкости, Pa * sec
-D: float = 1e-10 # коэффициент диффузии,
+D: float = 1e-9 # коэффициент диффузии,
 g: float = 9.81  # ускорение свободного падения
 v: float = -(2 / 9) * r ** 2 * g * ((rho_partical - rho_fluid) / myu)  # скорость по Стоксу
 V: np.ndarray = v * np.ones(shape=N, dtype=float)
@@ -93,15 +93,15 @@ print("v = ", v)
 C_top: float = 0.0  # концентрация сверху
 C_bottom: float = 0.0  # концентрация снизу
 
-C_init: float = 0.3  # начальная концентрация
+C_init: float = 0.1  # начальная концентрация
 C_old_solution = (C_init) * np.ones(shape=N, dtype=float)  # массив для записи решения на старом временном слое
 
 C_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
 
 # данные, касающиеся времени
-all_time: float = 70000.0  # все рассматриваемое время, sec
+all_time: float = 200000.0  # все рассматриваемое время, sec
 dt: float = 1  # по критерию Курента, sec
-AAAA: float = 2000  # временной шаг для отображения на графике инетресующий момент времени
+AAAA: float = 20000  # временной шаг для отображения на графике инетресующий момент времени
 time_steps: int = int(all_time / dt)  # количество врем промежутков для расчета
 a_o: float = dz / dt
 
@@ -127,7 +127,7 @@ while (time_iter <= all_time):
     f = rho_partical / rho
     V = v * (1 - C_old_solution) ** 2
 
-    # ----- ГУ 1 рода
+    # # # ----- ГУ 1 рода
     # a_p[0] = 1
     # a_w[0] = 0
     # a_e[0] = -1
@@ -141,13 +141,13 @@ while (time_iter <= all_time):
     # a_p[0] = 1
     # a_w[0] = 0
     # a_e[0] = 1
-    # b[0] = C_top
+    # b[0] = -dz * C_top * (1 - f[N - 1]) * V[N - 1] / D
     # a_p[N - 1] = 1
     # a_w[N - 1] = 1
     # a_e[N - 1] = 0
-    # b[N - 1] = C_bottom
+    # b[N - 1] = dz * C_bottom * (1 - f[N - 1]) * V[N - 1] / D
 
-    # ----- ГУ 3 рода (схема против потока)
+    # # ----- ГУ 3 рода (схема против потока)
     a_p[0] = 1
     a_w[0] = 0
     a_e[0] = D / (D + dz * (1 - f[1]) * V[1])
@@ -168,8 +168,8 @@ while (time_iter <= all_time):
                                                   C_old_solution)  # получаем решение на данном временном шаге
     C_old_solution = C_current_solution_numerical
 
-    # C_current_solution_numerical[0] = (C_current_solution_numerical[0] + C_current_solution_numerical[1]) / 2
-    # C_current_solution_numerical[N - 1] = (C_current_solution_numerical[N - 2] + C_current_solution_numerical[N - 1]) / 2
+    # C_current_solution_numerical[1] = (C_current_solution_numerical[0] + C_current_solution_numerical[1]) / 2
+    # C_current_solution_numerical[N - 2] = (C_current_solution_numerical[N - 2] + C_current_solution_numerical[N - 1]) / 2
 
 
     if (time_iter % AAAA == 0):
