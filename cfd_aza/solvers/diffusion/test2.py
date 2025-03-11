@@ -1,5 +1,6 @@
 import matplotlib.pyplot as mp
 import numpy as np
+import math as m
 from cfd_aza.solvers.boundary_type import *
 
 """ 
@@ -73,7 +74,7 @@ def tdma_algorithm(
 # данные, касающиеся самой системы
 N_origin: int = 10  # количество к.о.
 N: int = N_origin + 2  # количество к.о. с учетом фиктивных к.о.
-length: float = 0.01  # длина всего объекта, m
+length: float = 0.005  # длина всего объекта, m
 delta: float = 0.000001  # m
 dz: float = length / N_origin  # m
 L: np.ndarray = np.arange(start=(-dz / 2), stop=length + (dz / 2) + delta, step=dz)
@@ -92,15 +93,16 @@ print("v = ", v)
 C_top: float = 0.0  # концентрация сверху
 C_bottom: float = 0.0  # концентрация снизу
 
-C_init: float = 0.5  # начальная концентрация
+C_init: float = 0.3  # начальная концентрация
 C_old_solution = (C_init) * np.ones(shape=N, dtype=float)  # массив для записи решения на старом временном слое
 
 C_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
+C_old_solution_set = np.concatenate((C_old_solution_set, C_old_solution))
 
 # данные, касающиеся времени
-all_time: float = 30000.0  # все рассматриваемое время, sec
+all_time: float = 100000.0  # все рассматриваемое время, sec
 dt: float = 1  # по критерию Курента, sec
-AAAA: float = 10000  # временной шаг для отображения на графике инетресующий момент времени
+AAAA: float = 5000  # временной шаг для отображения на графике инетресующий момент времени
 time_steps: int = int(all_time / dt)  # количество врем промежутков для расчета
 a_o: float = dz / dt
 
@@ -160,18 +162,19 @@ while (time_iter <= all_time):
     # ----- ГУ 3 рода (схема против потока)
     a_p[0] = 1
     a_w[0] = 0
-    a_e[0] = D / (D + dz * (1 - f[0]) * V[0])
+    a_e[0] = D / (D + dz * (1 - f[1]) * V[1])
     b[0] = 0
     a_p[N - 1] = 1
-    a_w[N - 1] = (D + dz * (1 - f[N - 2]) * V[N - 2]) / D
+    a_w[N - 1] = (D + dz * (1 - f[N - 1]) * V[N - 1]) / D
     a_e[N - 1] = 0
     b[N - 1] = 0
 
     for i in range(1, N - 1):
         a_w[i] = D / dz + (V[i] * (1 - f[i]))
         a_e[i] = D / dz
-        a_p[i] = a_w[i] + a_e[i] + a_o
+        a_p[i] = D / dz + (V[i + 1] * (1 - f[i + 1])) + a_e[i] + a_o
         b[i] = a_o * C_old_solution[i]
+
 
     C_current_solution_numerical = tdma_algorithm(a_p, a_w, a_e, b, N,
                                                   C_old_solution)  # получаем решение на данном временном шаге
@@ -208,7 +211,7 @@ while (time_iter <= all_time):
     time_iter += dt
 
 
-C_old_solution_set = C_old_solution_set.reshape((time_steps // AAAA + 1, N))
+C_old_solution_set = C_old_solution_set.reshape((time_steps // AAAA + 2, N))
 
 print("integral = ", integral)
 
