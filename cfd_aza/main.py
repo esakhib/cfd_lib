@@ -12,26 +12,26 @@ from cfd_aza.visual.plotting import Visual
 
 
 input_data = InputDataHeatConductivity(
-    N = 5,
+    N = 10,
     length = 10,
-    T_init = 30,
-    T_right = 500,
-    T_left = 100,
+    T_init = 20,
+    T_right = 30,
+    T_left = 20,
     k = 5,
     q_left = 0,
-    q_right = 100,
-    T_env = 0,
-    h = 0,
+    q_right = 30,
+    T_env = 100,
+    h = -5,
 )
 
 time_data = TimeData(
-    all_time = 10.0,
-    delta_time = 2.0
+    all_time = 50.0,
+    delta_time = 1.0
 )
 
 boundary_condition = BoundaryCondition(
-    left_side = BoundaryType.Dirichlet,
-    right_side = BoundaryType.Neumann
+    left_side = BoundaryType.Robin,
+    right_side = BoundaryType.Robin
 )
 
 equation = HeatConductivity(

@@ -114,10 +114,10 @@ class HeatConductivity:
             self._a_e[0] = 1
             self._b[0] = self._q_left * (self._dx / self._k)
         elif (self._left_side == BoundaryType.Robin):
-            self._a_p[0] = -(self._c * self._dx / 2) - 1
+            self._a_p[0] = (self._c * self._dx / 2) - 1
             self._a_w[0] = 0
-            self._a_e[0] = (self._c * self._dx / 2) - 1
-            self._b[0] = -self._c * self._dx * self._T_environment
+            self._a_e[0] = -(self._c * self._dx / 2) - 1
+            self._b[0] = self._c * self._dx * self._T_environment
 
         # calculation boundary coefficients on right side
         if (self._right_side == BoundaryType.Dirichlet):

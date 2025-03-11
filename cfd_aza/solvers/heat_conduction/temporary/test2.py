@@ -86,8 +86,8 @@ L: np.ndarray = np.arange(start=(-dx / 2), stop=length + (dx / 2) + delta, step=
 L[0], L[N - 1] = 0, L[N - 1] - (dx / 2)
 
 # данные, касающиеся времени
-all_time: float = 10.0  # все рассматриваемое время, sec
-dt: float = 10.0  # sec
+all_time: float = 10000.0  # все рассматриваемое время, sec
+dt: float = 1000.0  # sec
 time_steps: int = int(all_time / dt)  # количество врем промежутков
 a_o: float = k * dx / dt  # a_o = (rho * c * dx) / dt
 
@@ -168,7 +168,7 @@ while (time_iter <= all_time):
     mp.xlabel('Length, [mm]')
     mp.ylabel('Temperature, [°C]')
     mp.title('Numerical solution of heat conductivity')
-    mp.axis('scaled')
+    # mp.axis('scaled')
     mp.show()
     time_iter += dt
     i += 1

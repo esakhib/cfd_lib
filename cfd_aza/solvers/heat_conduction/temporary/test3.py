@@ -64,7 +64,7 @@ def tdma_algorithm(
 ########################################################################################################################
 
 # выбор режима расчета ГУ: справа, слева, оба одновременно
-request = Req.right  #  right / left / both
+request = Req.both  #  right / left / both
 
 
 # данные, касающиеся самого тела
@@ -123,7 +123,7 @@ while (time_iter <= all_time):
         a_p[0], a_w[0], a_e[0], b[0] = ((c * dx / 2) - 1), 0, (
                     -(c * dx / 2) - 1), c * dx * T_environment  # учитываем фиктивный к
         a_p[N - 1], a_w[N - 1], a_e[N - 1], b[N - 1] = (
-                    (c * dx / 2) + 1), (1 - (c * dx / 2)), 0, c * dx * T_environment
+                    (-c * dx / 2) + 1), (1 - (-c * dx / 2)), 0, -c * dx * T_environment
 
     for i in range(1, N - 1):
         a_w[i] = k / dx

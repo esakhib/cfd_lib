@@ -28,13 +28,12 @@ class Visual:
         self._time_iter: float = self._delta_time
         self._i: int = 0
         while (self._time_iter <= self._all_time):
-            fig, ax = mp.subplots()
-            line, = ax.plot(self._L, self._solution_set[self._i], "-*m", label='[T] numerical')
-            mp.legend()
-            mp.xlabel('Length, [mm]')
-            mp.ylabel('Temperature, [°C]')
-            mp.title('Numerical solution of heat conductivity')
-            mp.axis('scaled')
-            mp.show()
+            mp.plot(self._L, self._solution_set[self._i], "-*", label='%d сек' % (self._time_iter))
             self._time_iter += self._delta_time
             self._i += 1
+        # mp.legend()
+        mp.xlabel('Length, [mm]')
+        mp.ylabel('Temperature, [°C]')
+        mp.title('Numerical solution of heat conductivity')
+        # mp.axis('scaled')
+        mp.show()
