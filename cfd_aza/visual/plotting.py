@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as mp
+import matplotlib as mpl
 
 
 class Visual:
@@ -19,6 +20,8 @@ class Visual:
         self._L: np.ndarray = output_data.L
         self._delta_time: float = output_data.delta_time
         self._all_time: float = output_data.all_time
+        self._dt: float = 1.0
+        self._time_steps: int = int(self._all_time / self._dt)
 
         self._time_iter: float = 0.0
         self._i: int = 0
@@ -27,8 +30,10 @@ class Visual:
     def plot_data(self) -> None:
         self._time_iter: float = self._delta_time
         self._i: int = 0
+        cmap = mpl.colormaps['viridis']
+        colors = cmap(np.linspace(0, 1, (self._time_steps // self._delta_time + 1)))
         while (self._time_iter <= self._all_time):
-            mp.plot(self._L, self._solution_set[self._i], "-*", label='%d сек' % (self._time_iter))
+            mp.plot(self._L, self._solution_set[self._i], "-*", label='%d сек' % (self._time_iter), color=colors[self._i])
             self._time_iter += self._delta_time
             self._i += 1
         # mp.legend()

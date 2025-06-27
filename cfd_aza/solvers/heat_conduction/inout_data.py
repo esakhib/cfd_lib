@@ -16,6 +16,7 @@ class InputDataHeatConductivity:
     q_right: float
     T_env: float
     h: float
+    rho: float
 
 @dataclass
 class TimeData:

@@ -57,6 +57,7 @@ class HeatConductivity:
         self._q_right: float = input_data.q_right
         self._T_environment: float = input_data.T_env
         self._h: float = input_data.h
+        self._rho: float = input_data.rho
 
         # TODO: add Sp and Sc for source linearizing
         # linearize temperature source S = S_c + S_p * T[i]
@@ -90,13 +91,14 @@ class HeatConductivity:
 
         # time calculations
         self._all_time: float = time_data.all_time
-        self._dt: float = time_data.delta_time
+        self._delta_time: float = time_data.delta_time
+        self._dt: float = 1.0
         self._time_steps: int = int(self._all_time / self._dt)
         self._time_iter: float = 0.0
 
         # extra variables for correct program working
-        self._a_o: float = self._k * self._dx / self._dt  # a_o = (rho * c * dx) / dt
         self._c: float = self._h / self._k
+        self._a_o: float = (self._rho * self._c * self._dx) / self._dt  # a_o = (rho * c * dx) / dt
 
     def apply_bndry_cond(self):
 
@@ -161,6 +163,7 @@ class HeatConductivity:
         """ Get solutions in time """
 
         self._time_iter = self._dt
+        self._iter = 0
 
         while (self._time_iter <= self._all_time):
             self.apply_bndry_cond()
@@ -172,13 +175,17 @@ class HeatConductivity:
             self._T_current_solution[self._N - 1] = (self._T_current_solution[self._N - 2] + self._T_current_solution[
                 self._N - 1]) / 2
 
-            # record all solutions
-            self._T_solution_set = np.concatenate(
-                (self._T_solution_set, self._T_current_solution))  # записываем отдельно все эти решения
+            # record solutions
+            if (self._time_iter % self._delta_time == 0):
+                self._T_solution_set = np.concatenate(
+                    (self._T_solution_set, self._T_current_solution))
+                self._iter += 1
+
+              # записываем отдельно все эти решения
 
             self._time_iter += self._dt
 
-        self._T_solution_set = self._T_solution_set.reshape((self._time_steps, self._N))
+        self._T_solution_set = self._T_solution_set.reshape((int(self._time_steps // self._delta_time + 1), self._N))
 
         return self._T_solution_set
 

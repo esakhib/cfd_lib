@@ -22,11 +22,12 @@ input_data = InputDataHeatConductivity(
     q_right = 30,
     T_env = 100,
     h = -5,
+    rho = 1000
 )
 
 time_data = TimeData(
-    all_time = 50.0,
-    delta_time = 1.0
+    all_time = 100.0,
+    delta_time = 20.0
 )
 
 boundary_condition = BoundaryCondition(
