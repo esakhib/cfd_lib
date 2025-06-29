@@ -73,9 +73,9 @@ def tdma_algorithm(
 # bottom = 'neumann'
 
 # данные, касающиеся самой системы
-N_origin: int = 5  # количество к.о.
+N_origin: int = 100  # количество к.о.
 N: int = N_origin + 2  # количество к.о. с учетом фиктивных к.о.
-length: float = 0.1  # длина всего объекта, m
+length: float = 1  # длина всего объекта, m
 delta: float = 1e-10  # m
 dz: float = length / N_origin  # m
 DZ: np.ndarray = np.ones(N)
@@ -85,8 +85,8 @@ L[1], L[N - 2] = L[0] - (dz / 2), 0
 # L[0], L[N - 1] = 0, L[N - 1] - (dz/2)
 print(L)
 
-r: float = 1e-8  # радиус частицы, m
-rho_partical: float = 19300  # плотность частицы, kg / m^3
+r: float = 1e-3  # радиус частицы, m
+rho_partical: float = 1900  # плотность частицы, kg / m^3
 rho_fluid: float = 1000  # плотность жидкости, kg / m^3
 myu_0: float = 1e-3  # коэффициент вязкости, Pa * sec
 T: float = 273 + 20 # температура среды, K
@@ -102,15 +102,17 @@ print("v = ", v)
 C_top: float = 0.0  # концентрация сверху
 C_bottom: float = 1e-8  # концентрация снизу
 
-C_init: float = 0.1  # начальная концентрация
+C_init: float = 0.07  # начальная концентрация
 C_old_solution = (C_init) * np.ones(shape=N, dtype=float)  # массив для записи решения на старом временном слое
 
 C_old_solution_set: np.array = np.array([], dtype=float)  # массив для записи всех решений
 
+# TODO: надо добавить расчет числа курента и так попробовать рассчитывать временной шаг
+# TODO: изучить как вообще эти шаги реализовывать, как правильно в таком случае задавать тип переменных
 # данные, касающиеся времени
-all_time: float = 10000000.0  # все рассматриваемое время, sec
-dt: float = 1000  # по критерию Курента, sec
-AAAA: float = 1000000  # временной шаг для отображения на графике инетресующий момент времени
+all_time: float = 1000.0  # все рассматриваемое время, sec
+dt: float = 1e-2  # по критерию Куранта, sec
+AAAA: int = 100  # временной шаг для отображения на графике инетресующий момент времени
 time_steps: int = int(all_time / dt)  # количество врем промежутков для расчета
 a_o: float = dz / dt
 
@@ -125,9 +127,9 @@ b: np.ndarray = np.zeros(shape=N, dtype=float)
 
 # цикл с решением уравнений
 
-integral = np.zeros(int(all_time / AAAA) + 1)
+integral = np.zeros(int(int(all_time) / AAAA))
 integral[0] = np.sum(C_old_solution * dz)
-time_arr: np.ndarray = np.linspace(AAAA, all_time + AAAA, int(all_time / AAAA) + 1)
+# time_arr: np.ndarray = np.linspace(AAAA, all_time + AAAA, int(all_time / AAAA) + 1)
 iter = 0
 time_iter: float = 0  # текущее время
 while (time_iter <= all_time):
@@ -139,8 +141,8 @@ while (time_iter <= all_time):
     f = rho_partical / rho
     V = v * (1 - C_old_solution) ** 2
     myu = myu_0 * (1 - C_old_solution * 2.5)
-    D = (k * T) / (6 * m.pi * myu * (r))  # коэффициент диффузии
-
+    # D = (k * T) / (6 * m.pi * myu * (r))  # коэффициент диффузии
+    D = 1e-10 * np.ones(shape=N, dtype=float)
 
 
     # # # ----- ГУ 1 рода
@@ -188,14 +190,15 @@ while (time_iter <= all_time):
     # C_current_solution_numerical[N - 2] = (C_current_solution_numerical[N - 2] + C_current_solution_numerical[N - 1]) / 2
 
 
-    if (time_iter % AAAA == 0):
+    if (time_iter > 1) and (time_iter % AAAA == 0):
         C_old_solution_set = np.concatenate(
             (C_old_solution_set, C_current_solution_numerical))  # записываем отдельно все эти решения
         integral[iter] = np.sum(C_old_solution[1 : N - 1] * dz)  # численный интеграл решений, для проверки выполнения закона сохранения
         iter += 1
-        print("C = ", C_current_solution_numerical)
-        print("V = ", V)
-        print("D = ", D)
+        print(iter)
+        # print("C = ", C_current_solution_numerical)
+        # print("V = ", V)
+        # print("D = ", D)
 
 
 
@@ -221,9 +224,9 @@ C_old_solution_set = C_old_solution_set.reshape((iter, N))
 print("integral = ", integral)
 
 
-C_analytical = C_old_solution[N - 2] * np.exp(-((4/3) * m.pi * ((2*r) ** 3) * (rho_partical - rho_fluid) * g * L[1 : N - 1]) / (k * T))
+# C_analytical = C_old_solution[N - 2] * np.exp(-((4/3) * m.pi * ((r) ** 3) * (rho_partical - rho_fluid) * g * L[1 : N - 1]) / (k * T))
 # C_analytical = C_old_solution[N - 2] * np.exp(-((4/3) * m.pi * (r ** 3) * ((rho_partical * C_old_solution[1 : N - 1]) - (rho_fluid * (1 - C_old_solution[1 : N - 1]))) * g * L[1 : N - 1]) / (k * T))
-print("C_analytical = ", C_analytical)
+# print("C_analytical = ", C_analytical)
 print("C_equilibrium_solution = ", C_old_solution[1 : N - 1])
 
 # -----------------------------------------------------------------------------------------------------------------------
